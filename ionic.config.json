@@ -1,0 +1,7 @@
+{
+  "name": "wadaag",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
