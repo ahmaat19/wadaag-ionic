@@ -13,6 +13,7 @@ import {
   IonPage,
   useIonAlert,
 } from '@ionic/react'
+
 import { useEffect, useRef, useState } from 'react'
 import useWindowDimensions from '../hooks/useWindowDimensions'
 import { Geolocation } from '@capacitor/geolocation'
