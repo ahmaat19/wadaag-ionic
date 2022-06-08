@@ -15,7 +15,6 @@ const Home: React.FC = () => {
     longitude: 0,
   })
   const printCurrentPosition = async () => {
-    console.log('printCurrentPosition')
     const coordinates = await Geolocation.getCurrentPosition()
 
     setState({

@@ -18,10 +18,10 @@ import {
   IonButton,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { golfOutline, home, square } from 'ionicons/icons'
+import { golfOutline, home, person, square } from 'ionicons/icons'
 import Home from './pages/Home'
 import StartTrip from './pages/StartTrip'
-import Tab3 from './pages/Tab3'
+import Entry from './pages/Entry'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css'
@@ -41,12 +41,13 @@ import '@ionic/react/css/display.css'
 
 /* Theme variables */
 import './theme/variables.css'
+import Login from './pages/Login'
+import Splash from './pages/Splash'
 
 setupIonicReact()
 
 const App: React.FC = () => {
   const [networkStatus, setNetworkStatus] = useState<boolean>()
-  const [geoLocation, setGeoLocation] = useState<any>()
 
   Network.addListener('networkStatusChange', (status) => {
     setNetworkStatus(status.connected)
@@ -67,24 +68,14 @@ const App: React.FC = () => {
       return status
     }
 
-    check()
-      .then((res) => {
-        setGeoLocation(res.location)
-      })
-      .catch((err) => {
-        setGeoLocation('not granted')
-      })
-  }, [geoLocation])
-
-  const geoRequestPermission = async () => {
-    await Geolocation.requestPermissions()
-  }
-
-  useEffect(() => {
-    if (geoLocation !== 'granted') {
-      geoRequestPermission()
+    const checkPermissions = async () => {
+      const status = await check()
+      if (status.location !== 'granted') {
+        await Geolocation.requestPermissions()
+      }
     }
-  }, [geoLocation])
+    checkPermissions()
+  }, [])
 
   if (!networkStatus) {
     return (
@@ -121,12 +112,15 @@ const App: React.FC = () => {
             <Route exact path='/start-trip'>
               <StartTrip />
             </Route>
-            <Route path='/tab3'>
-              <Tab3 />
+            <Route path='/entry'>
+              <Entry />
             </Route>
-            {/* <Route exact path='/'>
-            <Redirect to='/tab1' />
-          </Route> */}
+            <Route path='/login'>
+              <Login />
+            </Route>
+            <Route path='/splash'>
+              <Splash />
+            </Route>
           </IonRouterOutlet>
           <IonTabBar slot='bottom'>
             <IonTabButton tab='home' href='/'>
@@ -137,9 +131,14 @@ const App: React.FC = () => {
               <IonIcon icon={golfOutline} />
               <IonLabel>Start Trip</IonLabel>
             </IonTabButton>
-            <IonTabButton tab='tab3' href='/tab3'>
+
+            <IonTabButton tab='Splash' href='/splash'>
               <IonIcon icon={square} />
-              <IonLabel>Tab 3</IonLabel>
+              <IonLabel>Splash</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab='Profile' href='/profile'>
+              <IonIcon icon={person} />
+              <IonLabel>Profile</IonLabel>
             </IonTabButton>
           </IonTabBar>
         </IonTabs>
