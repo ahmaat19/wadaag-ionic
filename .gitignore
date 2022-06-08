@@ -26,3 +26,8 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+# custom ignore
+android
+ios
+.env
