@@ -1,4 +1,11 @@
-import { IonContent, IonImg, IonPage } from '@ionic/react'
+import {
+  IonCard,
+  IonCol,
+  IonContent,
+  IonImg,
+  IonPage,
+  IonRow,
+} from '@ionic/react'
 
 const Entry: React.FC = () => {
   const ride1 = '/assets/images/ride1.svg'
@@ -7,25 +14,19 @@ const Entry: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen>
-        <div
-          className='d-flex justify-content-center align-items-center flex-column h-100 text-light'
-          style={{
-            backgroundColor: 'purple',
-            // clipPath: 'polygon(0 1%, 100% 0, 0 41%, 0 15%);',
-          }}
-        >
-          <h1 className='text-center display-3 fw-bold ion-color-primary ion-padding'>
+      <IonContent fullscreen className='ion-padding' color='primary'>
+        <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
+          <h1 className='text-center display-3 fw-bold ion-color-primary'>
             How do you ride your <span className='text-warning'>WADAAG</span>?
           </h1>
-          <p className='text-center ion-padding'>
+          <p className='text-center'>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
             sequi atque quisquam fuga neque.
           </p>
 
-          <div className='row ion-padding'>
-            <div className='col-4'>
-              <div className='card border-0 shadow p-2'>
+          <IonRow>
+            <IonCol>
+              <IonCard routerLink='/start-trip' className='text-center m-0'>
                 <IonImg
                   src={ride1}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -36,10 +37,10 @@ const Entry: React.FC = () => {
                 >
                   1<sup>st</sup> Ride
                 </span>
-              </div>
-            </div>
-            <div className='col-4'>
-              <div className='card border-0 shadow p-2'>
+              </IonCard>
+            </IonCol>
+            <IonCol>
+              <IonCard routerLink='/' className='text-center m-0'>
                 <IonImg
                   src={ride2}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -50,10 +51,10 @@ const Entry: React.FC = () => {
                 >
                   2<sup>nd</sup> Ride
                 </span>
-              </div>
-            </div>
-            <div className='col-4'>
-              <div className='card border-0 shadow p-2'>
+              </IonCard>
+            </IonCol>
+            <IonCol>
+              <IonCard routerLink='/profile' className='text-center m-0'>
                 <IonImg
                   src={driver}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -64,9 +65,9 @@ const Entry: React.FC = () => {
                 >
                   Driver
                 </span>
-              </div>
-            </div>
-          </div>
+              </IonCard>
+            </IonCol>
+          </IonRow>
         </div>
       </IonContent>
     </IonPage>

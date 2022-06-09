@@ -30,7 +30,7 @@ const Home: React.FC = () => {
           <IonTitle>Home</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className='ion-padding'>
+      <IonContent fullscreen className='ion-padding' color='primary'>
         <div className='container'>
           <IonButton onClick={printCurrentPosition}>Current Position</IonButton>
           <br />

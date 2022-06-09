@@ -43,6 +43,8 @@ import '@ionic/react/css/display.css'
 import './theme/variables.css'
 import Login from './pages/Login'
 import Splash from './pages/Splash'
+import OTP from './pages/OTP'
+import Profile from './pages/Profile'
 
 setupIonicReact()
 
@@ -109,7 +111,7 @@ const App: React.FC = () => {
             <Route exact path='/'>
               <Home />
             </Route>
-            <Route exact path='/start-trip'>
+            <Route path='/start-trip'>
               <StartTrip />
             </Route>
             <Route path='/entry'>
@@ -121,9 +123,15 @@ const App: React.FC = () => {
             <Route path='/splash'>
               <Splash />
             </Route>
+            <Route path='/otp'>
+              <OTP />
+            </Route>
+            <Route path='/profile'>
+              <Profile />
+            </Route>
           </IonRouterOutlet>
           <IonTabBar slot='bottom'>
-            <IonTabButton tab='home' href='/'>
+            <IonTabButton tab='Home' href='/'>
               <IonIcon icon={home} />
               <IonLabel>Home</IonLabel>
             </IonTabButton>

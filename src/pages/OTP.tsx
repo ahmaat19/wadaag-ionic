@@ -6,26 +6,27 @@ import {
   IonItem,
   IonPage,
 } from '@ionic/react'
-import { call } from 'ionicons/icons'
+import { mail } from 'ionicons/icons'
 
-const Login: React.FC = () => {
+const OTP: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen color='primary' className='ion-padding'>
         <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
           <h1 className='text-center display-4 fw-bold ion-color-primary'>
-            Login
+            OTP Confirmation
           </h1>
           <p className='text-center'>
-            Please login with your mobile number if you have an account.
+            We sent you an OTP on your registered mobile number. Please enter
+            the OTP
           </p>
 
           <IonItem className='w-100 rounded-3'>
-            <IonIcon slot='start' icon={call} color='primary' />
-            <IonInput type='number' placeholder='e.g. 615301507' />
+            <IonIcon slot='start' icon={mail} color='primary' />
+            <IonInput type='number' placeholder='******' />
           </IonItem>
-          <IonButton color='light' routerLink='/otp' className='w-100 mt-4'>
-            Login
+          <IonButton color='light' routerLink='/entry' className='w-100 mt-4'>
+            Confirm
           </IonButton>
 
           <div className='position-fixed bottom-0 w-100 ion-padding'>
@@ -39,4 +40,4 @@ const Login: React.FC = () => {
   )
 }
 
-export default Login
+export default OTP

@@ -11,6 +11,9 @@ import {
   IonList,
   IonLoading,
   IonPage,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
   useIonAlert,
 } from '@ionic/react'
 
@@ -32,6 +35,15 @@ import {
   searchOutline,
   timeOutline,
 } from 'ionicons/icons'
+
+function doRefresh(event: CustomEvent<RefresherEventDetail>) {
+  console.log('Begin async operation')
+
+  setTimeout(() => {
+    console.log('Async operation has ended')
+    event.detail.complete()
+  }, 2000)
+}
 
 const libraries: any = ['places']
 
@@ -128,10 +140,6 @@ const StartTrip: React.FC = () => {
   }
 
   const startTrip = () => {
-    console.log({
-      originLatLng,
-      origin,
-    })
     present({
       cssClass: 'my-css',
       header: 'Start Trip',
@@ -157,11 +165,16 @@ const StartTrip: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding'>
+      <IonContent fullscreen className='ion-padding' color='primary'>
+        <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
+
         <IonCard
+          className='m-0'
           style={{
             marginTop: 5,
-            paddingRight: 10,
+            paddingRight: 20,
             paddingTop: 10,
             paddingBottom: 10,
           }}
@@ -171,12 +184,21 @@ const StartTrip: React.FC = () => {
               <IonItem>
                 <IonIcon slot='start' icon={locationOutline} color='primary' />
                 <input
-                  style={{ border: 'none', outline: 'none', width: '100%' }}
                   placeholder='Where are you going to day?'
                   type='text'
                   ref={destinationRef}
                   defaultValue={destination}
+                  className='border-0 w-100 bg-transparent'
+                  style={{ outline: 'none' }}
                 />
+                {origin && destination && (
+                  <IonIcon
+                    slot='end'
+                    icon={closeOutline}
+                    color='danger'
+                    onClick={clearRoute}
+                  />
+                )}
               </IonItem>
             </Autocomplete>
             <div style={{ marginLeft: 30 }}>
@@ -191,7 +213,7 @@ const StartTrip: React.FC = () => {
           </IonList>
         </IonCard>
 
-        <IonCard>
+        <IonCard className='mx-0'>
           <GoogleMap
             center={center}
             zoom={15}
@@ -236,18 +258,11 @@ const StartTrip: React.FC = () => {
           )}
         </IonCard>
         {origin && destination && (
-          <>
-            <IonFab vertical='bottom' horizontal='start' slot='fixed'>
-              <IonFabButton color='danger' onClick={clearRoute}>
-                <IonIcon icon={closeOutline} />
-              </IonFabButton>
-            </IonFab>
-            <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-              <IonFabButton onClick={startTrip}>
-                <IonIcon icon={arrowForwardCircle} />
-              </IonFabButton>
-            </IonFab>
-          </>
+          <IonFab vertical='bottom' horizontal='end' slot='fixed'>
+            <IonFabButton color='light' onClick={startTrip}>
+              <IonIcon color='primary' icon={arrowForwardCircle} />
+            </IonFabButton>
+          </IonFab>
         )}
       </IonContent>
     </IonPage>
