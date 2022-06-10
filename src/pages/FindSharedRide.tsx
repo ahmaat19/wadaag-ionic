@@ -128,6 +128,16 @@ const FindSharedRide: React.FC = () => {
     }
   }
 
+  const requestRide = () => {
+    present({
+      cssClass: 'my-css',
+      header: 'Alert',
+      message: 'Do you want to send a request to this rider?',
+      buttons: ['Cancel', { text: 'Send', handler: (d) => {} }],
+      onDidDismiss: () => {},
+    })
+  }
+
   const startTrip = () => {
     present({
       cssClass: 'my-css',
@@ -237,7 +247,11 @@ const FindSharedRide: React.FC = () => {
                     <IonLabel>
                       <div className='d-flex justify-content-between'>
                         <h3>{ride.name}</h3>
-                        <IonIcon icon={send} color='primary' />
+                        <IonIcon
+                          onClick={requestRide}
+                          icon={send}
+                          color='primary'
+                        />
                       </div>
                       <p>{ride.destination}</p>
                     </IonLabel>

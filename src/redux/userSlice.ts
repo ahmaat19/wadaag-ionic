@@ -1,3 +1,4 @@
+import { Storage } from '@capacitor/storage'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface UserState {
@@ -38,10 +39,38 @@ export const userSlice = createSlice({
       state.expiration = action.payload.expiration
       state.level = action.payload.level
       state.isAuth = true
+
+      const setAuth = async () => {
+        const value = {
+          name: state.name,
+          avatar: state.avatar,
+          userType: state.userType,
+          mobile: state.mobile,
+          points: state.points,
+          expiration: state.expiration,
+          level: state.level,
+          _id: state._id,
+          isAuth: true,
+        }
+        await Storage.set({
+          key: 'auth',
+          value: JSON.stringify(value),
+        })
+
+        return value
+      }
+      setAuth()
+    },
+    authLogout: (state) => {
+      setUser(initialState)
+      const removeAuth = async () => {
+        await Storage.remove({ key: 'auth' })
+      }
+      removeAuth()
     },
   },
 })
 
-export const { setUser } = userSlice.actions
+export const { setUser, authLogout } = userSlice.actions
 
 export default userSlice.reducer

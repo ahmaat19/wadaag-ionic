@@ -1,24 +1,6 @@
-import { Storage } from '@capacitor/storage'
 import { IonButton, IonContent, IonPage } from '@ionic/react'
-import { useEffect } from 'react'
-import { useHistory } from 'react-router'
 
 const Splash: React.FC = () => {
-  const history = useHistory()
-  const getAuth = async () => {
-    const { value } = await Storage.get({ key: 'auth' })
-    return JSON.parse(value as string)
-  }
-
-  useEffect(() => {
-    getAuth()
-      .then((auth) => {
-        if (auth) return history.replace('/profile')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [history])
   return (
     <IonPage>
       <IonContent fullscreen color='primary' className='ion-padding'>

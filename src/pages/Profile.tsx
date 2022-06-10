@@ -27,7 +27,7 @@ import { Camera, CameraResultType } from '@capacitor/camera'
 import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
-import { setUser } from '../redux/userSlice'
+import { authLogout } from '../redux/userSlice'
 
 const Profile: React.FC = () => {
   const history = useHistory()
@@ -113,22 +113,14 @@ const Profile: React.FC = () => {
     uploadImage(imageBlob as string)
   }
   const logout = async () => {
-    dispatch(
-      setUser({
-        _id: '',
-        name: '',
-        avatar: '',
-        userType: '',
-        mobile: 0,
-        points: 0,
-        expiration: 0,
-        level: 0,
-        isAuth: false,
-      })
-    )
+    dispatch(authLogout())
 
     history.replace('/login')
+    window.location.reload()
   }
+
+  // hide ionic tabs bar bottom on profile page
+  document.documentElement.style.setProperty('--ion-safe-area-bottom', '0px')
 
   return (
     <IonPage>
@@ -196,12 +188,10 @@ const Profile: React.FC = () => {
           </IonButton>
         </div>
         <div className='position-fixed bottom-0 ion-padding-bottom'>
-          <IonButton onClick={logout}>
-            <IonChip className='bg-light fw-bold'>
-              <IonIcon icon={logOut} color='primary' />
-              <IonLabel color='primary'>Logout</IonLabel>
-            </IonChip>
-          </IonButton>
+          <IonChip onClick={logout} className='bg-light fw-bold'>
+            <IonIcon icon={logOut} color='primary' />
+            <IonLabel color='primary'>Logout</IonLabel>
+          </IonChip>
         </div>
       </IonContent>
     </IonPage>

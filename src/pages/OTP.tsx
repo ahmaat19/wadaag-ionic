@@ -40,7 +40,7 @@ const OTP: React.FC = () => {
       )
 
       setTimeout(() => {
-        history.replace('/profile')
+        history.replace('/home')
       }, 1000)
     } else {
       present({

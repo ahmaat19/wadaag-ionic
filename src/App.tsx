@@ -1,9 +1,8 @@
-import { Route } from 'react-router-dom'
+import { Redirect, Route } from 'react-router-dom'
 
 import { Network } from '@capacitor/network'
 import { Geolocation } from '@capacitor/geolocation'
 import { useEffect, useState } from 'react'
-
 import {
   IonApp,
   IonIcon,
@@ -16,7 +15,7 @@ import {
   IonButton,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { car, golf, person, square } from 'ionicons/icons'
+import { car, golf, home, person } from 'ionicons/icons'
 import StartTrip from './pages/StartTrip'
 import Entry from './pages/Entry'
 
@@ -44,11 +43,17 @@ import OTP from './pages/OTP'
 import Profile from './pages/Profile'
 import SignUp from './pages/Signup'
 import FindSharedRide from './pages/FindSharedRide'
+import ProtectedRoute from './components/PotectedRoute'
+import { useDispatch } from 'react-redux'
+import PublicRoute from './components/PublicRoute'
+import { Storage } from '@capacitor/storage'
+import { setUser } from './redux/userSlice'
 
 setupIonicReact()
 
 const App: React.FC = () => {
   const [networkStatus, setNetworkStatus] = useState<boolean>()
+  const dispatch = useDispatch()
 
   Network.addListener('networkStatusChange', (status) => {
     setNetworkStatus(status.connected)
@@ -102,51 +107,54 @@ const App: React.FC = () => {
     )
   }
 
+  const getAuth = async () => {
+    const { value } = await Storage.get({ key: 'auth' })
+    const res = JSON.parse(value as string)
+
+    return res
+  }
+  getAuth().then((res) => {
+    if (res) {
+      dispatch(setUser(res))
+    }
+  })
+
   return (
     <IonApp>
       <IonReactRouter>
         <IonTabs>
           <IonRouterOutlet>
+            <ProtectedRoute exact component={Entry} path='/home' />
+            <ProtectedRoute exact component={StartTrip} path='/trip' />
+            <ProtectedRoute exact component={FindSharedRide} path='/search' />
+            <ProtectedRoute exact component={Profile} path='/profile' />
+
             <Route exact path='/'>
-              <StartTrip />
+              <Redirect to='/home' />
             </Route>
-            <Route path='/find-shared-ride'>
-              <FindSharedRide />
-            </Route>
-            <Route path='/entry'>
-              <Entry />
-            </Route>
-            <Route path='/login'>
-              <Login />
-            </Route>
-            <Route path='/splash'>
-              <Splash />
-            </Route>
-            <Route path='/otp'>
-              <OTP />
-            </Route>
-            <Route path='/profile'>
-              <Profile />
-            </Route>
-            <Route path='/signup'>
-              <SignUp />
-            </Route>
+
+            <PublicRoute exact component={Login} path='/login' />
+            <PublicRoute exact component={Splash} path='/splash' />
+            <PublicRoute exact component={OTP} path='/otp' />
+            <PublicRoute exact component={SignUp} path='/signup' />
           </IonRouterOutlet>
           <IonTabBar slot='bottom'>
-            <IonTabButton tab='StartTrip' href='/'>
+            <IonTabButton tab='entry' href='/home'>
+              <IonIcon icon={home} />
+              <IonLabel>Home</IonLabel>
+            </IonTabButton>
+
+            <IonTabButton tab='trip' href='/trip'>
               <IonIcon icon={golf} />
               <IonLabel>Start Trip</IonLabel>
             </IonTabButton>
-            <IonTabButton tab='find-shared-ride' href='/find-shared-ride'>
+
+            <IonTabButton tab='search' href='/search'>
               <IonIcon icon={car} />
               <IonLabel>Ride</IonLabel>
             </IonTabButton>
 
-            <IonTabButton tab='Splash' href='/splash'>
-              <IonIcon icon={square} />
-              <IonLabel>Splash</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab='Profile' href='/profile'>
+            <IonTabButton tab='profile' href='/profile'>
               <IonIcon icon={person} />
               <IonLabel>Profile</IonLabel>
             </IonTabButton>

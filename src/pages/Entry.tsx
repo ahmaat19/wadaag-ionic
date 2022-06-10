@@ -10,7 +10,6 @@ import {
 const Entry: React.FC = () => {
   const ride1 = '/assets/images/ride1.svg'
   const ride2 = '/assets/images/ride2.svg'
-  const driver = '/assets/images/driver.svg'
 
   return (
     <IonPage>
@@ -26,7 +25,7 @@ const Entry: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonCard routerLink='/' className='text-center m-0'>
+              <IonCard routerLink='/trip' className='text-center m-0'>
                 <IonImg
                   src={ride1}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -40,10 +39,7 @@ const Entry: React.FC = () => {
               </IonCard>
             </IonCol>
             <IonCol>
-              <IonCard
-                routerLink='/find-shared-ride'
-                className='text-center m-0'
-              >
+              <IonCard routerLink='/search' className='text-center m-0'>
                 <IonImg
                   src={ride2}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -53,20 +49,6 @@ const Entry: React.FC = () => {
                   style={{ color: 'purple' }}
                 >
                   2<sup>nd</sup> Ride
-                </span>
-              </IonCard>
-            </IonCol>
-            <IonCol>
-              <IonCard routerLink='/profile' className='text-center m-0'>
-                <IonImg
-                  src={driver}
-                  className='img-fluid w-100 mx-auto card-image-top'
-                />
-                <span
-                  className='text-center fw-bold'
-                  style={{ color: 'purple' }}
-                >
-                  Driver
                 </span>
               </IonCard>
             </IonCol>
