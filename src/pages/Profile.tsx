@@ -17,16 +17,59 @@ import {
 import {
   filter,
   hourglass,
+  logOut,
   statsChart,
   swapVertical,
 } from 'ionicons/icons'
-import { useState } from 'react'
-// import ProfileModal from '../components/ProfileModal'
+import { useEffect, useState } from 'react'
+
 import { Camera, CameraResultType } from '@capacitor/camera'
+import { useHistory } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../redux/store'
+import { setUser } from '../redux/userSlice'
 
 const Profile: React.FC = () => {
+  const history = useHistory()
+  const [state, setState] = useState({
+    name: '',
+    avatar: '',
+    userType: '',
+    mobile: 0,
+    points: 0,
+    expiration: 0,
+    level: 0,
+    _id: '0',
+    isAuth: false,
+  })
+
+  const user = useSelector((state: RootState) => state.user)
+  const dispatch = useDispatch()
+
   const [present, dismiss] = useIonToast()
   const [image, setImage] = useState<any>('https://github.com/ahmaat19.png')
+
+  useEffect(() => {
+    setState({
+      name: user.name,
+      avatar: user.avatar,
+      userType: user.userType,
+      mobile: user.mobile,
+      points: user.points,
+      expiration: user.expiration,
+      level: user.level,
+      _id: user._id,
+      isAuth: user.isAuth,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (user.isAuth === false) {
+      history.push('/login')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const uploadImage = async (path: string) => {
     const response = await fetch(path)
@@ -69,6 +112,23 @@ const Profile: React.FC = () => {
 
     uploadImage(imageBlob as string)
   }
+  const logout = async () => {
+    dispatch(
+      setUser({
+        _id: '',
+        name: '',
+        avatar: '',
+        userType: '',
+        mobile: 0,
+        points: 0,
+        expiration: 0,
+        level: 0,
+        isAuth: false,
+      })
+    )
+
+    history.replace('/login')
+  }
 
   return (
     <IonPage>
@@ -89,8 +149,8 @@ const Profile: React.FC = () => {
               </IonAvatar>
             </IonCol>
             <IonCol size='7'>
-              <span className='fs-3 fw-bold'>Ahmed Ibrahim</span>
-              <h6 className='mt-2 fw-light'>Rider</h6>
+              <span className='fs-3 fw-bold'>{state.name}</span>
+              <h6 className='mt-2 fw-light'>{state.userType}</h6>
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -98,11 +158,11 @@ const Profile: React.FC = () => {
         <IonLabel className='fw-light'>My Status</IonLabel> <br />
         <IonChip className='bg-light fw-bold'>
           <IonIcon icon={statsChart} color='primary' />
-          <IonLabel color='primary'>Level 26</IonLabel>
+          <IonLabel color='primary'>Level {state.level}</IonLabel>
         </IonChip>
         <IonChip className='bg-light fw-bold float-end'>
           <IonIcon icon={swapVertical} color='primary' />
-          <IonLabel color='primary'>98 Points</IonLabel>
+          <IonLabel color='primary'>{state.points} Points</IonLabel>
         </IonChip>
         <hr className='bg-light' />
         <IonLabel className='fw-light'>Payments</IonLabel> <br />
@@ -112,7 +172,7 @@ const Profile: React.FC = () => {
         </IonChip>
         <IonChip className='bg-light fw-bold float-end'>
           <IonIcon icon={hourglass} color='primary' />
-          <IonLabel color='primary'>17 days remaining</IonLabel>
+          <IonLabel color='primary'>{state.expiration} days remaining</IonLabel>
         </IonChip>
         <div className='mt-5'>
           <IonLabel className='fw-light'>Available payment method</IonLabel>
@@ -133,6 +193,14 @@ const Profile: React.FC = () => {
             >
               *789*638744*1#
             </a>
+          </IonButton>
+        </div>
+        <div className='position-fixed bottom-0 ion-padding-bottom'>
+          <IonButton onClick={logout}>
+            <IonChip className='bg-light fw-bold'>
+              <IonIcon icon={logOut} color='primary' />
+              <IonLabel color='primary'>Logout</IonLabel>
+            </IonChip>
           </IonButton>
         </div>
       </IonContent>

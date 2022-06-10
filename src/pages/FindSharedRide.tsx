@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonButton,
   IonCard,
   IonCardContent,
@@ -9,6 +10,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonListHeader,
   IonLoading,
   IonPage,
   IonRefresher,
@@ -18,22 +20,14 @@ import {
 } from '@ionic/react'
 
 import { useEffect, useRef, useState } from 'react'
-import useWindowDimensions from '../hooks/useWindowDimensions'
 import { Geolocation } from '@capacitor/geolocation'
-import {
-  useJsApiLoader,
-  GoogleMap,
-  Autocomplete,
-  Marker,
-  DirectionsRenderer,
-} from '@react-google-maps/api'
+import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
 import {
   arrowForwardCircle,
   close,
-  gitCommit,
   location,
   search,
-  time,
+  send,
 } from 'ionicons/icons'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
@@ -47,7 +41,7 @@ function doRefresh(event: CustomEvent<RefresherEventDetail>) {
 
 const libraries: any = ['places']
 
-const StartTrip: React.FC = () => {
+const FindSharedRide: React.FC = () => {
   const [lat, setLat] = useState(0)
   const [lng, setLng] = useState(0)
   const [present] = useIonAlert()
@@ -65,13 +59,10 @@ const StartTrip: React.FC = () => {
     printCurrentPosition()
   }, [])
 
-  const { width, height } = useWindowDimensions()
-
   const [origin, setOrigin] = useState({})
   const [destination, setDestination] = useState('')
   const [distance, setDistance] = useState('')
   const [duration, setDuration] = useState('')
-  const [directionsResponse, setDirectionsResponse] = useState(null)
   const [originLatLng, setOriginLatLng] = useState('')
   const [destinationLatLng, setDestinationLatLng] = useState('')
 
@@ -95,7 +86,6 @@ const StartTrip: React.FC = () => {
     setDestination('')
     setDistance('')
     setDuration('')
-    setDirectionsResponse(null)
     setOriginLatLng('')
     setDestinationLatLng('')
 
@@ -122,7 +112,6 @@ const StartTrip: React.FC = () => {
       setDestination(destinationRef.current!.value)
       setDistance(results.routes[0]!.legs[0]!.distance!.text)
       setDuration(results.routes[0]!.legs[0]!.duration!.text)
-      setDirectionsResponse(results as any)
       setOriginLatLng(`${oLan},${oLng}`)
       setDestinationLatLng(`${dLan},${dLng}`)
     } catch (error) {
@@ -163,13 +152,33 @@ const StartTrip: React.FC = () => {
     })
   }
 
+  const nearRides = [
+    {
+      _id: 1,
+      name: 'John Doe',
+      avatar: 'https://github.com/brad.png',
+      destination: 'Sydney, Australia',
+    },
+    {
+      _id: 1,
+      name: 'Ahmed Ibrahim',
+      avatar: 'https://github.com/ahmaat19.png',
+      destination: 'Makka Almukarramah, Mogadishu',
+    },
+    {
+      _id: 1,
+      name: 'Muse Farah',
+      avatar: 'https://github.com/muse.png',
+      destination: 'Mozambique',
+    },
+  ]
+
   return (
     <IonPage>
       <IonContent fullscreen className='ion-padding' color='primary'>
         <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-
         <IonCard
           className='m-0'
           style={{
@@ -213,50 +222,31 @@ const StartTrip: React.FC = () => {
           </IonList>
         </IonCard>
 
-        <IonCard className='mx-0'>
-          <GoogleMap
-            center={center}
-            zoom={15}
-            mapContainerStyle={{
-              width: width,
-              height: height / 2,
-            }}
-            options={{
-              disableDefaultUI: true,
-            }}
-          >
-            <Marker position={center} />
-            {directionsResponse && (
-              <DirectionsRenderer
-                directions={directionsResponse}
-                options={{
-                  polylineOptions: {
-                    strokeColor: '#5c1a67',
-                    strokeWeight: 5,
-                    strokeOpacity: 0.8,
-                  },
-                }}
-              />
-            )}
-          </GoogleMap>
-          {duration && distance && (
+        {origin && destination && (
+          <IonCard className='mx-0'>
             <IonCardContent>
-              <>
-                <p style={{ fontWeight: 'bold' }}>
-                  <IonIcon icon={time} color='primary' />{' '}
-                  <IonLabel>
-                    <span> Duration - {duration}</span>
-                  </IonLabel>
-                  <br />
-                  <IonIcon icon={gitCommit} color='primary' />{' '}
-                  <IonLabel>
-                    <span> Distance - {distance}</span>
-                  </IonLabel>
-                </p>
-              </>
+              <IonList>
+                <IonListHeader>
+                  <IonLabel> Near Rides </IonLabel>
+                </IonListHeader>
+                {nearRides.map((ride) => (
+                  <IonItem>
+                    <IonAvatar slot='start'>
+                      <img src={ride.avatar} alt={ride.avatar} />
+                    </IonAvatar>
+                    <IonLabel>
+                      <div className='d-flex justify-content-between'>
+                        <h3>{ride.name}</h3>
+                        <IonIcon icon={send} color='primary' />
+                      </div>
+                      <p>{ride.destination}</p>
+                    </IonLabel>
+                  </IonItem>
+                ))}
+              </IonList>
             </IonCardContent>
-          )}
-        </IonCard>
+          </IonCard>
+        )}
         {origin && destination && (
           <IonFab vertical='bottom' horizontal='end' slot='fixed'>
             <IonFabButton color='light' onClick={startTrip}>
@@ -269,4 +259,4 @@ const StartTrip: React.FC = () => {
   )
 }
 
-export default StartTrip
+export default FindSharedRide

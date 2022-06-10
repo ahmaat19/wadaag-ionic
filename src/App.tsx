@@ -1,7 +1,5 @@
-import {
-  // Redirect,
-  Route,
-} from 'react-router-dom'
+import { Route } from 'react-router-dom'
+
 import { Network } from '@capacitor/network'
 import { Geolocation } from '@capacitor/geolocation'
 import { useEffect, useState } from 'react'
@@ -18,8 +16,7 @@ import {
   IonButton,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { golfOutline, home, person, square } from 'ionicons/icons'
-import Home from './pages/Home'
+import { car, golf, person, square } from 'ionicons/icons'
 import StartTrip from './pages/StartTrip'
 import Entry from './pages/Entry'
 
@@ -45,6 +42,8 @@ import Login from './pages/Login'
 import Splash from './pages/Splash'
 import OTP from './pages/OTP'
 import Profile from './pages/Profile'
+import SignUp from './pages/Signup'
+import FindSharedRide from './pages/FindSharedRide'
 
 setupIonicReact()
 
@@ -89,7 +88,7 @@ const App: React.FC = () => {
           height: '100vh',
           flexDirection: 'column',
         }}
-        className='ion-text-center ion-padding'
+        className='ion-text-center ion-padding text-light'
       >
         <IonButton expand='block' color='danger'>
           No network connection
@@ -109,10 +108,10 @@ const App: React.FC = () => {
         <IonTabs>
           <IonRouterOutlet>
             <Route exact path='/'>
-              <Home />
-            </Route>
-            <Route path='/start-trip'>
               <StartTrip />
+            </Route>
+            <Route path='/find-shared-ride'>
+              <FindSharedRide />
             </Route>
             <Route path='/entry'>
               <Entry />
@@ -129,15 +128,18 @@ const App: React.FC = () => {
             <Route path='/profile'>
               <Profile />
             </Route>
+            <Route path='/signup'>
+              <SignUp />
+            </Route>
           </IonRouterOutlet>
           <IonTabBar slot='bottom'>
-            <IonTabButton tab='Home' href='/'>
-              <IonIcon icon={home} />
-              <IonLabel>Home</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab='StartTrip' href='/start-trip'>
-              <IonIcon icon={golfOutline} />
+            <IonTabButton tab='StartTrip' href='/'>
+              <IonIcon icon={golf} />
               <IonLabel>Start Trip</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab='find-shared-ride' href='/find-shared-ride'>
+              <IonIcon icon={car} />
+              <IonLabel>Ride</IonLabel>
             </IonTabButton>
 
             <IonTabButton tab='Splash' href='/splash'>

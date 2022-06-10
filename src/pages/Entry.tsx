@@ -26,7 +26,7 @@ const Entry: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonCard routerLink='/start-trip' className='text-center m-0'>
+              <IonCard routerLink='/' className='text-center m-0'>
                 <IonImg
                   src={ride1}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -40,7 +40,10 @@ const Entry: React.FC = () => {
               </IonCard>
             </IonCol>
             <IonCol>
-              <IonCard routerLink='/' className='text-center m-0'>
+              <IonCard
+                routerLink='/find-shared-ride'
+                className='text-center m-0'
+              >
                 <IonImg
                   src={ride2}
                   className='img-fluid w-100 mx-auto card-image-top'
