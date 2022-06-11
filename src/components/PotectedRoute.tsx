@@ -5,7 +5,6 @@ import { RootState } from '../redux/store'
 // @ts-ignore
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   const isAuth = useSelector((state: RootState) => state.user.isAuth)
-
   return (
     <Route
       {...rest}

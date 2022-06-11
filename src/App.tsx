@@ -52,7 +52,7 @@ import { setUser } from './redux/userSlice'
 setupIonicReact()
 
 const App: React.FC = () => {
-  const [networkStatus, setNetworkStatus] = useState<boolean>()
+  const [networkStatus, setNetworkStatus] = useState<boolean>(true)
   const dispatch = useDispatch()
 
   Network.addListener('networkStatusChange', (status) => {

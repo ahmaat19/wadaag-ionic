@@ -92,24 +92,26 @@ const Login: React.FC = () => {
             Please login with your mobile number if you have an account.
           </p>
 
-          <IonItem className='w-100 rounded-3'>
-            <IonIcon slot='start' icon={call} color='primary' />
-            <IonInput
-              value={mobile}
-              onIonChange={(e) => setMobile(e.target.value as number)}
-              inputMode='numeric'
-              type='number'
-              placeholder='e.g. 615301507'
-            />
-          </IonItem>
-          <IonButton
-            type='submit'
-            onClick={(e) => handleSubmit(e as any)}
-            color='light'
-            className='w-100 mt-4'
-          >
-            Login
-          </IonButton>
+          <form onSubmit={handleSubmit} className='w-100 '>
+            <IonItem className='rounded-3'>
+              <IonIcon slot='start' icon={call} color='primary' />
+              <IonInput
+                value={mobile}
+                onIonChange={(e) => setMobile(e.target.value as number)}
+                inputMode='numeric'
+                type='number'
+                placeholder='e.g. 615301507'
+              />
+            </IonItem>
+            <IonButton
+              type='submit'
+              // onClick={(e) => handleSubmit(e as any)}
+              color='light'
+              className='w-100 mt-4'
+            >
+              Login
+            </IonButton>
+          </form>
 
           <div className='position-fixed bottom-0 w-100 ion-padding'>
             <Link

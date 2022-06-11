@@ -87,88 +87,88 @@ const SignUp: React.FC = () => {
           <p className='text-center'>
             Please enter your details to create an account
           </p>
+          <form onSubmit={handleSubmit} className='w-100 '>
+            <IonList className='rounded-3 w-100 mb-1 bg-transparent'>
+              <IonRadioGroup
+                value={selected}
+                onIonChange={(e) => setSelected(e.detail.value!)}
+              >
+                <IonListHeader className='bg-light rounded-top'>
+                  <IonLabel className='fs-5'>Who are you?</IonLabel>
+                </IonListHeader>
 
-          <IonList className='w-100 rounded-3 mb-1 bg-transparent'>
-            <IonRadioGroup
-              value={selected}
-              onIonChange={(e) => setSelected(e.detail.value!)}
-            >
-              <IonListHeader className='bg-light rounded-top'>
-                <IonLabel className='fs-5'>Who are you?</IonLabel>
-              </IonListHeader>
-
-              <IonItem>
-                <IonLabel>Rider</IonLabel>
-                <IonRadio slot='start' value='rider' />
-              </IonItem>
-
-              <IonItem className='rounded-bottom'>
-                <IonLabel>Driver</IonLabel>
-                <IonRadio slot='start' value='driver' />
-              </IonItem>
-            </IonRadioGroup>
-
-            <IonItem className='w-100 rounded-3 my-1'>
-              <IonLabel position='fixed'>Name </IonLabel>
-              <IonInput
-                style={{ marginLeft: -30 }}
-                type='text'
-                inputMode='text'
-                placeholder='enter name'
-                value={name}
-                onIonChange={(e) => setName(e.detail.value!)}
-              />
-            </IonItem>
-
-            <IonItem className='w-100 rounded-3 my-1'>
-              <IonLabel position='fixed'>Mobile </IonLabel>
-              <IonInput
-                style={{ marginLeft: -30 }}
-                inputMode='numeric'
-                type='number'
-                placeholder='enter mobile number'
-                value={mobile}
-                onIonChange={(e) => setMobile(e.detail.value!)}
-              />
-            </IonItem>
-            {selected === 'driver' && (
-              <>
-                <IonItem className='w-100 rounded-3 my-1'>
-                  <IonLabel position='fixed'>Plate </IonLabel>
-                  <IonInput
-                    style={{ marginLeft: -30 }}
-                    inputMode='text'
-                    type='text'
-                    placeholder='enter plate number'
-                    value={plate}
-                    onIonChange={(e) => setPlate(e.detail.value!)}
-                  />
+                <IonItem>
+                  <IonLabel>Rider</IonLabel>
+                  <IonRadio slot='start' value='rider' />
                 </IonItem>
 
-                <IonItem className='w-100 rounded-3 my-1'>
-                  <IonLabel position='fixed'>License </IonLabel>
-                  <IonInput
-                    style={{ marginLeft: -30 }}
-                    inputMode='text'
-                    type='text'
-                    placeholder='enter license number'
-                    value={license}
-                    onIonChange={(e) => setLicense(e.detail.value!)}
-                  />
+                <IonItem className='rounded-bottom'>
+                  <IonLabel>Driver</IonLabel>
+                  <IonRadio slot='start' value='driver' />
                 </IonItem>
-              </>
-            )}
+              </IonRadioGroup>
 
-            <IonButton
-              type='submit'
-              color='light'
-              routerLink='/otp'
-              className='w-100 mt-4'
-              onClick={(e) => handleSubmit(e as any)}
-            >
-              Signup
-            </IonButton>
-          </IonList>
+              <IonItem className='w-100 rounded-3 my-1'>
+                <IonLabel position='fixed'>Name </IonLabel>
+                <IonInput
+                  style={{ marginLeft: -30 }}
+                  type='text'
+                  inputMode='text'
+                  placeholder='enter name'
+                  value={name}
+                  onIonChange={(e) => setName(e.detail.value!)}
+                />
+              </IonItem>
+
+              <IonItem className='w-100 rounded-3 my-1'>
+                <IonLabel position='fixed'>Mobile </IonLabel>
+                <IonInput
+                  style={{ marginLeft: -30 }}
+                  inputMode='numeric'
+                  type='number'
+                  placeholder='enter mobile number'
+                  value={mobile}
+                  onIonChange={(e) => setMobile(e.detail.value!)}
+                />
+              </IonItem>
+              {selected === 'driver' && (
+                <>
+                  <IonItem className='w-100 rounded-3 my-1'>
+                    <IonLabel position='fixed'>Plate </IonLabel>
+                    <IonInput
+                      style={{ marginLeft: -30 }}
+                      inputMode='text'
+                      type='text'
+                      placeholder='enter plate number'
+                      value={plate}
+                      onIonChange={(e) => setPlate(e.detail.value!)}
+                    />
+                  </IonItem>
+
+                  <IonItem className='w-100 rounded-3 my-1'>
+                    <IonLabel position='fixed'>License </IonLabel>
+                    <IonInput
+                      style={{ marginLeft: -30 }}
+                      inputMode='text'
+                      type='text'
+                      placeholder='enter license number'
+                      value={license}
+                      onIonChange={(e) => setLicense(e.detail.value!)}
+                    />
+                  </IonItem>
+                </>
+              )}
+
+              <IonButton
+                onClick={(e) => handleSubmit(e as any)}
+                type='submit'
+                color='light'
+                className='w-100 mt-4'
+              >
+                Signup
+              </IonButton>
+            </IonList>
+          </form>
 
           <div className='position-fixed bottom-0 w-100 ion-padding'>
             <Link

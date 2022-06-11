@@ -95,24 +95,21 @@ const OTP: React.FC = () => {
             the OTP
           </p>
 
-          <IonItem className='w-100 rounded-3'>
-            <IonIcon slot='start' icon={mail} color='primary' />
-            <IonInput
-              value={OTP}
-              onIonChange={(e) => setOTP(e.target.value as number)}
-              type='number'
-              placeholder='******'
-              inputMode='numeric'
-            />
-          </IonItem>
-          <IonButton
-            type='submit'
-            onClick={(e) => handleSubmit(e as any)}
-            color='light'
-            className='w-100 mt-4'
-          >
-            Confirm
-          </IonButton>
+          <form onSubmit={handleSubmit} className='w-100 '>
+            <IonItem className='rounded-3'>
+              <IonIcon slot='start' icon={mail} color='primary' />
+              <IonInput
+                value={OTP}
+                onIonChange={(e) => setOTP(e.target.value as number)}
+                type='number'
+                placeholder='******'
+                inputMode='numeric'
+              />
+            </IonItem>
+            <IonButton type='submit' color='light' className='w-100 mt-4'>
+              Confirm
+            </IonButton>
+          </form>
 
           <div className='position-fixed bottom-0 w-100 ion-padding'>
             <Link
