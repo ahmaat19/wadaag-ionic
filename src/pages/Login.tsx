@@ -4,6 +4,7 @@ import {
   IonIcon,
   IonInput,
   IonItem,
+  IonLoading,
   IonPage,
   useIonToast,
 } from '@ionic/react'
@@ -13,10 +14,17 @@ import { useHistory } from 'react-router'
 import { Storage } from '@capacitor/storage'
 import { useEffect, useState } from 'react'
 
+import useAuthHook from '../api/auth'
+// import {useForm} from 'react-hook-form'
+
 const Login: React.FC = () => {
   const history = useHistory()
   const [mobile, setMobile] = useState<number>()
   const [present, dismiss] = useIonToast()
+
+  const { postLogin } = useAuthHook()
+
+  const { isLoading, isError, error, mutateAsync, isSuccess, data } = postLogin
 
   const getAuth = async () => {
     const { value } = await Storage.get({ key: 'auth' })
@@ -33,10 +41,32 @@ const Login: React.FC = () => {
       })
   }, [history])
 
+  useEffect(() => {
+    if (isSuccess) {
+      console.log(data.otp)
+      history.push('/otp')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
+
+  useEffect(() => {
+    if (isError) {
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: error as string,
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError])
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (Number(mobile) === 123456) {
-      history.replace('/otp')
+    if (mobile) {
+      // @ts-ignore
+      mutateAsync({ mobileNumber: mobile })
     } else {
       present({
         buttons: [{ text: 'hide', handler: () => dismiss() }],
@@ -46,6 +76,10 @@ const Login: React.FC = () => {
         duration: 5000,
       })
     }
+  }
+
+  if (isLoading) {
+    return <IonLoading isOpen={true} message={'Loading...'} />
   }
   return (
     <IonPage>

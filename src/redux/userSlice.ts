@@ -11,6 +11,7 @@ export interface UserState {
   level: number
   isAuth: boolean
   _id: string
+  token: string
 }
 
 const initialState: UserState = {
@@ -23,6 +24,7 @@ const initialState: UserState = {
   level: 0,
   isAuth: false,
   _id: '',
+  token: '',
 }
 
 export const userSlice = createSlice({
@@ -39,6 +41,7 @@ export const userSlice = createSlice({
       state.expiration = action.payload.expiration
       state.level = action.payload.level
       state.isAuth = true
+      state.token = action.payload.token
 
       const setAuth = async () => {
         const value = {
@@ -51,6 +54,7 @@ export const userSlice = createSlice({
           level: state.level,
           _id: state._id,
           isAuth: true,
+          token: state.token,
         }
         await Storage.set({
           key: 'auth',

@@ -6,14 +6,17 @@ import {
   IonLabel,
   IonList,
   IonListHeader,
+  IonLoading,
   IonPage,
   IonRadio,
   IonRadioGroup,
+  useIonToast,
 } from '@ionic/react'
 import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router'
 import { useEffect, useState } from 'react'
 import { Storage } from '@capacitor/storage'
+import useAuthHook from '../api/auth'
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState<string>('')
@@ -21,8 +24,35 @@ const SignUp: React.FC = () => {
   const [plate, setPlate] = useState<string>('')
   const [license, setLicense] = useState<string>('')
   const [selected, setSelected] = useState<string>('rider')
+  const [present, dismiss] = useIonToast()
+
+  const { postUser } = useAuthHook()
+
+  const { isLoading, isError, error, mutateAsync, isSuccess, data } = postUser
 
   const history = useHistory()
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log(data.otp)
+      history.push('/otp')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
+
+  useEffect(() => {
+    if (isError) {
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: error as string,
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError])
+
   const getAuth = async () => {
     const { value } = await Storage.get({ key: 'auth' })
     return JSON.parse(value as string)
@@ -38,23 +68,14 @@ const SignUp: React.FC = () => {
       })
   }, [history])
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault()
+  if (isLoading) {
+    return <IonLoading isOpen={true} message={'Loading...'} />
+  }
 
-    if (selected === 'driver') {
-      console.log({
-        name,
-        mobile,
-        plate,
-        license,
-        selected,
-      })
-    } else {
-      console.log({
-        name,
-        mobile,
-      })
-    }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    // @ts-ignore
+    mutateAsync({ name, mobile, plate, license, selected })
   }
   return (
     <IonPage>

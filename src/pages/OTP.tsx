@@ -4,44 +4,71 @@ import {
   IonIcon,
   IonInput,
   IonItem,
+  IonLoading,
   IonPage,
   useIonToast,
 } from '@ionic/react'
 import { mail } from 'ionicons/icons'
 import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { setUser } from '../redux/userSlice'
+import useAuthHook from '../api/auth'
 
 const OTP: React.FC = () => {
   const history = useHistory()
   const [OTP, setOTP] = useState<number>()
   const [present, dismiss] = useIonToast()
 
+  const { postOTP } = useAuthHook()
+
+  const { isLoading, isError, error, mutateAsync, isSuccess, data } = postOTP
+
   const dispatch = useDispatch()
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (Number(OTP) === 1234) {
+  useEffect(() => {
+    if (isSuccess) {
       dispatch(
         setUser({
-          _id: '1',
-          name: 'Ahmed Ibrahim',
-          avatar: 'https://github.com/ahmaat19.png',
-          userType: 'Driver',
-          mobile: 123456789,
-          points: 100,
-          expiration: 17,
-          level: 24,
+          _id: data._id,
+          name: data.name,
+          avatar: data.avatar,
+          userType: data.userType,
+          mobile: data.mobile,
+          points: data.points,
+          expiration: data.expiration,
+          level: data.level,
           isAuth: true,
+          token: data.token,
         })
       )
-
       setTimeout(() => {
         history.replace('/home')
       }, 1000)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
+
+  useEffect(() => {
+    if (isError) {
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: error as string,
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (OTP) {
+      // @ts-ignore
+      mutateAsync({ otp: OTP })
     } else {
       present({
         buttons: [{ text: 'hide', handler: () => dismiss() }],
@@ -51,6 +78,10 @@ const OTP: React.FC = () => {
         duration: 5000,
       })
     }
+  }
+
+  if (isLoading) {
+    return <IonLoading isOpen={true} message={'Loading...'} />
   }
   return (
     <IonPage>

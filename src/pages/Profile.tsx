@@ -8,6 +8,7 @@ import {
   IonHeader,
   IonIcon,
   IonLabel,
+  IonLoading,
   IonPage,
   IonRow,
   IonTitle,
@@ -28,6 +29,7 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
 import { authLogout } from '../redux/userSlice'
+import useProfilesHook from '../api/profiles'
 
 const Profile: React.FC = () => {
   const history = useHistory()
@@ -43,11 +45,15 @@ const Profile: React.FC = () => {
     isAuth: false,
   })
 
+  const { getProfile } = useProfilesHook()
+
+  const { isLoading, isError, error, data } = getProfile
+
   const user = useSelector((state: RootState) => state.user)
   const dispatch = useDispatch()
 
   const [present, dismiss] = useIonToast()
-  const [image, setImage] = useState<any>('https://github.com/ahmaat19.png')
+  const [image, setImage] = useState<any>(data && data.image)
 
   useEffect(() => {
     setState({
@@ -70,6 +76,19 @@ const Profile: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (isError) {
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: error as string,
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError])
 
   const uploadImage = async (path: string) => {
     const response = await fetch(path)
@@ -122,6 +141,10 @@ const Profile: React.FC = () => {
   // hide ionic tabs bar bottom on profile page
   document.documentElement.style.setProperty('--ion-safe-area-bottom', '0px')
 
+  if (isLoading) {
+    return <IonLoading isOpen={true} message={'Loading...'} />
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -137,12 +160,16 @@ const Profile: React.FC = () => {
                 onClick={takePicture}
                 className='bg-light display-1 fs-1 w-75 h-75'
               >
-                <img src={image} className='display-1 fs-1' alt='logo' />
+                <img
+                  src={(data && data.image) || image}
+                  className='display-1 fs-1'
+                  alt='logo'
+                />
               </IonAvatar>
             </IonCol>
             <IonCol size='7'>
               <span className='fs-3 fw-bold'>{state.name}</span>
-              <h6 className='mt-2 fw-light'>{state.userType}</h6>
+              <h6 className='mt-2 fw-light'>{state.userType?.toUpperCase()}</h6>
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -150,11 +177,11 @@ const Profile: React.FC = () => {
         <IonLabel className='fw-light'>My Status</IonLabel> <br />
         <IonChip className='bg-light fw-bold'>
           <IonIcon icon={statsChart} color='primary' />
-          <IonLabel color='primary'>Level {state.level}</IonLabel>
+          <IonLabel color='primary'>Level {data && data.level}</IonLabel>
         </IonChip>
         <IonChip className='bg-light fw-bold float-end'>
           <IonIcon icon={swapVertical} color='primary' />
-          <IonLabel color='primary'>{state.points} Points</IonLabel>
+          <IonLabel color='primary'>{data && data.points} Points</IonLabel>
         </IonChip>
         <hr className='bg-light' />
         <IonLabel className='fw-light'>Payments</IonLabel> <br />
@@ -164,7 +191,9 @@ const Profile: React.FC = () => {
         </IonChip>
         <IonChip className='bg-light fw-bold float-end'>
           <IonIcon icon={hourglass} color='primary' />
-          <IonLabel color='primary'>{state.expiration} days remaining</IonLabel>
+          <IonLabel color='primary'>
+            {data && data.expiration} days remaining
+          </IonLabel>
         </IonChip>
         <div className='mt-5'>
           <IonLabel className='fw-light'>Available payment method</IonLabel>
