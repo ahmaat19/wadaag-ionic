@@ -15,6 +15,7 @@ import {
   IonRefresherContent,
   RefresherEventDetail,
   useIonAlert,
+  useIonToast,
 } from '@ionic/react'
 
 import { useEffect, useRef, useState } from 'react'
@@ -35,6 +36,8 @@ import {
   search,
   time,
 } from 'ionicons/icons'
+import useRidesHook from '../api/rides'
+import { RidePending } from '../components/RidePending'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   console.log('Begin async operation')
@@ -51,6 +54,7 @@ const StartTrip: React.FC = () => {
   const [lat, setLat] = useState(0)
   const [lng, setLng] = useState(0)
   const [present] = useIonAlert()
+  const [toast, dismiss] = useIonToast()
 
   /** @type React.MutableRefObject<HTMLDivElement> */
   const destinationRef = useRef<HTMLInputElement>(null)
@@ -74,21 +78,94 @@ const StartTrip: React.FC = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null)
   const [originLatLng, setOriginLatLng] = useState('')
   const [destinationLatLng, setDestinationLatLng] = useState('')
+  const [pendingRide, setPendingRide] = useState(false)
 
   const center = {
     lat: lat,
     lng: lng,
   }
 
+  const { postRide, getPendingRider, deleteRide } = useRidesHook({
+    page: 1,
+    limit: 25,
+  })
+
+  const {
+    isLoading: isLoadingPost,
+    isSuccess: isSuccessPost,
+    isError: isErrorPost,
+    error: errorPost,
+    mutateAsync: mutateAsyncPost,
+  } = postRide
+
+  const {
+    isLoading: isLoadingDelete,
+    isSuccess: isSuccessDelete,
+    isError: isErrorDelete,
+    error: errorDelete,
+    mutateAsync: mutateAsyncDelete,
+  } = deleteRide
+
+  const { data: pendingRider, refetch } = getPendingRider
+
+  useEffect(() => {
+    if (isSuccessDelete) {
+      setPendingRide(false)
+      toast({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: 'Ride action successfully',
+        color: 'success',
+        position: 'top',
+        duration: 5000,
+      })
+      refetch()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessDelete])
+
+  useEffect(() => {
+    if (pendingRider) {
+      setDestination(pendingRider.destination)
+      setDistance(pendingRider.distance)
+      setDuration(pendingRider.duration)
+      setOriginLatLng(pendingRider.originLatLng)
+      setDestinationLatLng(pendingRider.destinationLatLng)
+      setPendingRide(true)
+    }
+  }, [pendingRider])
+
+  useEffect(() => {
+    if (isErrorPost || isErrorDelete) {
+      toast({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: (errorPost as string) || (errorDelete as string),
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isErrorPost, isErrorDelete])
+
+  useEffect(() => {
+    if (isSuccessPost) {
+      toast({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: 'Ride has been started',
+        color: 'success',
+        position: 'top',
+        duration: 5000,
+      })
+      refetch()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessPost])
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env!.REACT_APP_GOOGLE_MAPS_API_KEY!,
     libraries: libraries,
   })
-
-  if (!isLoaded) {
-    return <IonLoading isOpen={true} message={'Loading...'} />
-  }
 
   function clearRoute() {
     setOrigin({})
@@ -149,8 +226,9 @@ const StartTrip: React.FC = () => {
         {
           text: 'Confirm',
           handler: () =>
-            console.log({
-              origin: origin,
+            // @ts-ignore
+            mutateAsyncPost({
+              origin: 'My Location',
               destination: destination,
               distance: distance,
               duration: duration,
@@ -161,6 +239,61 @@ const StartTrip: React.FC = () => {
       ],
       onDidDismiss: (e) => {},
     })
+  }
+
+  const cancelTrip = () => {
+    present({
+      cssClass: 'my-css',
+      header: 'Cancel Trip',
+      message: 'Are you sure you want to cancel the trip?',
+      buttons: [
+        'Cancel',
+        {
+          text: 'Confirm',
+          handler: () =>
+            // @ts-ignore
+            mutateAsyncDelete({
+              id: pendingRider._id,
+              status: 'cancelled',
+            }),
+        },
+      ],
+      onDidDismiss: (e) => {},
+    })
+  }
+
+  const completeTrip = () => {
+    present({
+      cssClass: 'my-css',
+      header: 'Cancel Trip',
+      message: 'Are you sure you want to complete the trip?',
+      buttons: [
+        'Cancel',
+        {
+          text: 'Confirm',
+          handler: () =>
+            // @ts-ignore
+            mutateAsyncDelete({
+              id: pendingRider._id,
+              status: 'completed',
+            }),
+        },
+      ],
+      onDidDismiss: (e) => {},
+    })
+  }
+
+  if (isLoadingPost || isLoadingDelete || !isLoaded) {
+    return <IonLoading isOpen={true} message={'Loading...'} />
+  }
+
+  if (pendingRide) {
+    return (
+      <RidePending
+        cancelTrip={() => cancelTrip() as any}
+        completeTrip={() => completeTrip() as any}
+      />
+    )
   }
 
   return (

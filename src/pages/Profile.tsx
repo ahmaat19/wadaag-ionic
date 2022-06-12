@@ -201,7 +201,7 @@ const Profile: React.FC = () => {
           <br />
           <IonButton color='light' expand='block'>
             <a
-              href='tel:*789*638744*1#'
+              href='tel:*789*638744*1%23'
               className='fw-bold text-decoration-none'
             >
               Pay now with your EVC wallet
@@ -210,7 +210,7 @@ const Profile: React.FC = () => {
           <h6 className='text-center'>OR</h6>
           <IonButton color='light' expand='block'>
             <a
-              href='tel:*789*638744*1#'
+              href='tel:*789*638744*1%23'
               className='fw-bold text-decoration-none'
             >
               *789*638744*1#

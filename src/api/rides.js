@@ -36,7 +36,7 @@ export default function useRidesHook(props) {
   const getPendingRider = useQuery(
     'rides-pending',
     async () => await dynamicAPI('get', `${url}/pending`, {}),
-    { retry: 0 }
+    { retry: 3 }
   )
 
   const postRide = useMutation(
