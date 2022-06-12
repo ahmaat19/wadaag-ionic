@@ -15,12 +15,11 @@ const Entry: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className='ion-padding' color='primary'>
         <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
-          <h1 className='text-center display-3 fw-bold ion-color-primary'>
-            How do you ride your <span className='text-warning'>WADAAG</span>?
+          <h1 className='text-center display-4 fw-bold ion-color-primary'>
+            How do you ride today?
           </h1>
           <p className='text-center'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
-            sequi atque quisquam fuga neque.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </p>
 
           <IonRow>

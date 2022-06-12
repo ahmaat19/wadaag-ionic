@@ -85,10 +85,7 @@ const StartTrip: React.FC = () => {
     lng: lng,
   }
 
-  const { postRide, getPendingRider, deleteRide } = useRidesHook({
-    page: 1,
-    limit: 25,
-  })
+  const { postRide, getPendingRider, deleteRide } = useRidesHook()
 
   const {
     isLoading: isLoadingPost,
@@ -106,7 +103,11 @@ const StartTrip: React.FC = () => {
     mutateAsync: mutateAsyncDelete,
   } = deleteRide
 
-  const { data: pendingRider, refetch } = getPendingRider
+  const {
+    data: pendingRider,
+    refetch,
+    isLoading: isLoadingPending,
+  } = getPendingRider
 
   useEffect(() => {
     if (isSuccessDelete) {
@@ -283,7 +284,7 @@ const StartTrip: React.FC = () => {
     })
   }
 
-  if (isLoadingPost || isLoadingDelete || !isLoaded) {
+  if (isLoadingPost || isLoadingDelete || !isLoaded || isLoadingPending) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 

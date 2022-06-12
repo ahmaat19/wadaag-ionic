@@ -6,15 +6,7 @@ const url = '/api/rides'
 const queryKey = 'rides'
 
 export default function useRidesHook(props) {
-  const { page = 1, id, q = '', limit = 25 } = props
   const queryClient = useQueryClient()
-
-  const getRides = useQuery(
-    queryKey,
-    async () =>
-      await dynamicAPI('get', `${url}?page=${page}&q=${q}&limit=${limit}`, {}),
-    { retry: 0 }
-  )
 
   const updateRide = useMutation(
     async (obj) => await dynamicAPI('put', `${url}/${obj._id}`, obj),
@@ -57,7 +49,6 @@ export default function useRidesHook(props) {
 
   return {
     getPendingRider,
-    getRides,
     updateRide,
     deleteRide,
     postRide,

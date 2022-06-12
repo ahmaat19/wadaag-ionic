@@ -4,8 +4,6 @@ import {
   IonCard,
   IonCardContent,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonIcon,
   IonItem,
   IonLabel,
@@ -17,18 +15,14 @@ import {
   IonRefresherContent,
   RefresherEventDetail,
   useIonAlert,
+  useIonToast,
 } from '@ionic/react'
 
 import { useEffect, useRef, useState } from 'react'
 import { Geolocation } from '@capacitor/geolocation'
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
-import {
-  arrowForwardCircle,
-  close,
-  location,
-  search,
-  send,
-} from 'ionicons/icons'
+import { close, location, search, send } from 'ionicons/icons'
+import useRidesHook from '../api/rides'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   console.log('Begin async operation')
@@ -45,6 +39,7 @@ const FindSharedRide: React.FC = () => {
   const [lat, setLat] = useState(0)
   const [lng, setLng] = useState(0)
   const [present] = useIonAlert()
+  const [toast, dismiss] = useIonToast()
 
   /** @type React.MutableRefObject<HTMLDivElement> */
   const destinationRef = useRef<HTMLInputElement>(null)
@@ -59,12 +54,33 @@ const FindSharedRide: React.FC = () => {
     printCurrentPosition()
   }, [])
 
-  const [origin, setOrigin] = useState({})
-  const [destination, setDestination] = useState('')
-  const [distance, setDistance] = useState('')
-  const [duration, setDuration] = useState('')
-  const [originLatLng, setOriginLatLng] = useState('')
-  const [destinationLatLng, setDestinationLatLng] = useState('')
+  const origin: any = {}
+  const destination: any = ''
+
+  const { postNearRiders } = useRidesHook()
+
+  const {
+    isLoading: isLoadingPost,
+    isError: isErrorPost,
+    error: errorPost,
+    mutateAsync: mutateAsyncPost,
+    data: dataPost,
+  } = postNearRiders
+
+  // console.log(dataPost && dataPost)
+
+  useEffect(() => {
+    if (isErrorPost) {
+      toast({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: (errorPost as string) || 'No near riders found',
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isErrorPost])
 
   const center = {
     lat: lat,
@@ -77,18 +93,7 @@ const FindSharedRide: React.FC = () => {
     libraries: libraries,
   })
 
-  if (!isLoaded) {
-    return <IonLoading isOpen={true} message={'Loading...'} />
-  }
-
   function clearRoute() {
-    setOrigin({})
-    setDestination('')
-    setDistance('')
-    setDuration('')
-    setOriginLatLng('')
-    setDestinationLatLng('')
-
     destinationRef.current!.value = ''
   }
 
@@ -108,12 +113,18 @@ const FindSharedRide: React.FC = () => {
       const dLan: number = results!.routes[0]!.legs[0]!.end_location!.lat()
       const dLng: number = results.routes[0]!.legs[0]!.end_location!.lng()
 
-      setOrigin(center)
-      setDestination(destinationRef.current!.value)
-      setDistance(results.routes[0]!.legs[0]!.distance!.text)
-      setDuration(results.routes[0]!.legs[0]!.duration!.text)
-      setOriginLatLng(`${oLan},${oLng}`)
-      setDestinationLatLng(`${dLan},${dLng}`)
+      // setOrigin(center)
+      // setDestination(destinationRef.current!.value)
+      // setDistance(results.routes[0]!.legs[0]!.distance!.text)
+      // setDuration(results.routes[0]!.legs[0]!.duration!.text)
+      // setOriginLatLng(`${oLan},${oLng}`)
+      // setDestinationLatLng(`${dLan},${dLng}`)
+
+      // @ts-ignore
+      mutateAsyncPost({
+        originLatLng: `${oLan},${oLng}`,
+        destinationLatLng: `${dLan},${dLng}`,
+      })
     } catch (error) {
       present({
         cssClass: 'my-css',
@@ -138,50 +149,9 @@ const FindSharedRide: React.FC = () => {
     })
   }
 
-  const startTrip = () => {
-    present({
-      cssClass: 'my-css',
-      header: 'Start Trip',
-      message: 'Are you sure you want to start the trip?',
-      buttons: [
-        'Cancel',
-        {
-          text: 'Confirm',
-          handler: () =>
-            console.log({
-              origin: origin,
-              destination: destination,
-              distance: distance,
-              duration: duration,
-              originLatLng: originLatLng,
-              destinationLatLng: destinationLatLng,
-            }),
-        },
-      ],
-      onDidDismiss: (e) => {},
-    })
+  if (isLoadingPost || !isLoaded) {
+    return <IonLoading isOpen={true} message={'Loading...'} />
   }
-
-  const nearRides = [
-    {
-      _id: 1,
-      name: 'John Doe',
-      avatar: 'https://github.com/brad.png',
-      destination: 'Sydney, Australia',
-    },
-    {
-      _id: 1,
-      name: 'Ahmed Ibrahim',
-      avatar: 'https://github.com/ahmaat19.png',
-      destination: 'Makka Almukarramah, Mogadishu',
-    },
-    {
-      _id: 1,
-      name: 'Muse Farah',
-      avatar: 'https://github.com/muse.png',
-      destination: 'Mozambique',
-    },
-  ]
 
   return (
     <IonPage>
@@ -232,17 +202,18 @@ const FindSharedRide: React.FC = () => {
           </IonList>
         </IonCard>
 
-        {origin && destination && (
+        {dataPost && dataPost.length > 0 && (
           <IonCard className='mx-0'>
             <IonCardContent>
               <IonList>
                 <IonListHeader>
                   <IonLabel> Near Rides </IonLabel>
                 </IonListHeader>
-                {nearRides.map((ride) => (
-                  <IonItem>
+                {/* @ts-ignore */}
+                {dataPost.map((ride) => (
+                  <IonItem key={ride._id}>
                     <IonAvatar slot='start'>
-                      <img src={ride.avatar} alt={ride.avatar} />
+                      <img src={ride.image} alt={ride.image} />
                     </IonAvatar>
                     <IonLabel>
                       <div className='d-flex justify-content-between'>
@@ -260,13 +231,6 @@ const FindSharedRide: React.FC = () => {
               </IonList>
             </IonCardContent>
           </IonCard>
-        )}
-        {origin && destination && (
-          <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-            <IonFabButton color='light' onClick={startTrip}>
-              <IonIcon color='primary' icon={arrowForwardCircle} />
-            </IonFabButton>
-          </IonFab>
         )}
       </IonContent>
     </IonPage>
