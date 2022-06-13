@@ -23,6 +23,7 @@ import { Geolocation } from '@capacitor/geolocation'
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
 import { close, location, search, send } from 'ionicons/icons'
 import useRidesHook from '../api/rides'
+import { useHistory } from 'react-router'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   console.log('Begin async operation')
@@ -54,6 +55,8 @@ const FindSharedRide: React.FC = () => {
     printCurrentPosition()
   }, [])
 
+  const history = useHistory()
+
   const origin: any = {}
   const destination: any = ''
 
@@ -73,7 +76,7 @@ const FindSharedRide: React.FC = () => {
     if (isErrorPost) {
       toast({
         buttons: [{ text: 'hide', handler: () => dismiss() }],
-        message: (errorPost as string) || 'No near riders found',
+        message: errorPost as string,
         color: 'danger',
         position: 'top',
         duration: 5000,
@@ -113,13 +116,6 @@ const FindSharedRide: React.FC = () => {
       const dLan: number = results!.routes[0]!.legs[0]!.end_location!.lat()
       const dLng: number = results.routes[0]!.legs[0]!.end_location!.lng()
 
-      // setOrigin(center)
-      // setDestination(destinationRef.current!.value)
-      // setDistance(results.routes[0]!.legs[0]!.distance!.text)
-      // setDuration(results.routes[0]!.legs[0]!.duration!.text)
-      // setOriginLatLng(`${oLan},${oLng}`)
-      // setDestinationLatLng(`${dLan},${dLng}`)
-
       // @ts-ignore
       mutateAsyncPost({
         originLatLng: `${oLan},${oLng}`,
@@ -139,12 +135,21 @@ const FindSharedRide: React.FC = () => {
     }
   }
 
-  const requestRide = () => {
+  const requestRide = (ride: any) => {
     present({
       cssClass: 'my-css',
       header: 'Alert',
       message: 'Do you want to send a request to this rider?',
-      buttons: ['Cancel', { text: 'Send', handler: (d) => {} }],
+      buttons: [
+        'Cancel',
+        {
+          text: 'Send',
+          handler: (d) => {
+            // console.log(ride)
+            history.push(`/chat/${ride._id}`)
+          },
+        },
+      ],
       onDidDismiss: () => {},
     })
   }
@@ -219,7 +224,7 @@ const FindSharedRide: React.FC = () => {
                       <div className='d-flex justify-content-between'>
                         <h3>{ride.name}</h3>
                         <IonIcon
-                          onClick={requestRide}
+                          onClick={(e) => requestRide(ride)}
                           icon={send}
                           color='primary'
                         />

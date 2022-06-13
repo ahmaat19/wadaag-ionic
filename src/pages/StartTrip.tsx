@@ -266,7 +266,7 @@ const StartTrip: React.FC = () => {
   const completeTrip = () => {
     present({
       cssClass: 'my-css',
-      header: 'Cancel Trip',
+      header: 'Complete Trip',
       message: 'Are you sure you want to complete the trip?',
       buttons: [
         'Cancel',

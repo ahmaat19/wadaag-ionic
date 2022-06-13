@@ -48,6 +48,7 @@ import { useDispatch } from 'react-redux'
 import PublicRoute from './components/PublicRoute'
 import { Storage } from '@capacitor/storage'
 import { setUser } from './redux/userSlice'
+import Chat from './pages/Chat'
 
 setupIonicReact()
 
@@ -128,6 +129,7 @@ const App: React.FC = () => {
             <ProtectedRoute exact component={StartTrip} path='/trip' />
             <ProtectedRoute exact component={FindSharedRide} path='/search' />
             <ProtectedRoute exact component={Profile} path='/profile' />
+            <ProtectedRoute exact component={Chat} path='/chat/:id' />
 
             <Route exact path='/'>
               <Redirect to='/home' />
