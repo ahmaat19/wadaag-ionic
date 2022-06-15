@@ -15,6 +15,7 @@ import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import io from 'socket.io-client'
+import { defaultUrl } from '../config/url'
 import { RootState } from '../redux/store'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
@@ -26,7 +27,7 @@ function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   }, 2000)
 }
 
-let socket = io('http://192.10.11.100:3000')
+let socket = io(defaultUrl)
 const Chat: React.FC = () => {
   const params = useParams()
   console.log(params)

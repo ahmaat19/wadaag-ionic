@@ -4,24 +4,38 @@ import {
   IonChip,
   IonContent,
   IonIcon,
+  IonItem,
+  IonItemDivider,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
   IonLoading,
   IonPage,
   useIonAlert,
   useIonToast,
 } from '@ionic/react'
-import { checkmark, close, notificationsCircle } from 'ionicons/icons'
-import { useEffect } from 'react'
+import {
+  checkmark,
+  close,
+  notificationsCircle,
+  person,
+  phonePortrait,
+  pricetag,
+} from 'ionicons/icons'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import useRidesHook from '../api/rides'
 import { RootState } from '../redux/store'
 import io from 'socket.io-client'
 import { useHistory } from 'react-router'
+import { defaultUrl } from '../config/url'
 
-let socket = io('http://192.10.11.100:3000')
+let socket = io(defaultUrl)
 
 const RideWaiting: React.FC = () => {
   const user = useSelector((state: RootState) => state.user)
+  const [requestInfo, setRequestInfo] = useState<any>([])
 
   const [present] = useIonAlert()
   const [toast, dismiss] = useIonToast()
@@ -67,6 +81,14 @@ const RideWaiting: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isErrorDelete])
 
+  useEffect(() => {
+    socket.on(user._id, (data: any) => {
+      setRequestInfo([...requestInfo, data])
+    })
+  }, [requestInfo])
+
+  console.log(requestInfo && requestInfo)
+
   const cancelTrip = () => {
     present({
       cssClass: 'my-css',
@@ -77,11 +99,10 @@ const RideWaiting: React.FC = () => {
         {
           text: 'Confirm',
           handler: () =>
-            // @ts-ignore
             mutateAsyncDelete({
               id: pendingRider._id,
               status: 'cancelled',
-            }),
+            } as any),
         },
       ],
       onDidDismiss: (e) => {},
@@ -98,28 +119,28 @@ const RideWaiting: React.FC = () => {
         {
           text: 'Confirm',
           handler: () =>
-            // @ts-ignore
             mutateAsyncDelete({
               id: pendingRider._id,
               status: 'completed',
-            }),
+            } as any),
         },
       ],
       onDidDismiss: (e) => {},
     })
   }
 
-  const acceptRequest = () => {
-    console.log('ride accept func')
+  const acceptRide = (request: any) => {
     socket.emit('ride-accept', {
       requestType: 'accept',
       user: user,
     })
   }
 
-  // const filteredRequest = {}
-  // incomingRequest.rider?.toString() === user?._id?.toString() &&
-  // incomingRequest
+  const deleteRideRequest = (request: any) => {
+    setRequestInfo((prev: any) =>
+      prev.filter((item: any) => item._id !== request._id)
+    )
+  }
 
   if (isLoadingDelete || isLoadingPending) {
     return <IonLoading isOpen={true} message={'Loading...'} />
@@ -143,19 +164,49 @@ const RideWaiting: React.FC = () => {
           </IonCardContent>
         </IonCard>
 
-        {/* {filteredRequest && (
+        {requestInfo.length > 0 && (
           <IonCard>
             <IonCardContent>
-              <p>Your have an incoming request </p>
-              <IonChip onClick={acceptRequest} color='success'>
-                <IonIcon icon={notificationsCircle} />
-                <IonLabel>
-                  Accept Request width ${filteredRequest.chat[0].price}
-                </IonLabel>
-              </IonChip>
+              <IonLabel>You have received new ride request</IonLabel>
+              <hr className='bg-info' />
+
+              {requestInfo.map((request: any, index: number) => (
+                <IonItemSliding key={index} className='ion-margin-top'>
+                  <IonItemOptions side='start'>
+                    <IonItemOption onClick={(e) => deleteRideRequest(request)}>
+                      <IonIcon color='danger' icon={close} />
+                    </IonItemOption>
+                  </IonItemOptions>
+                  <IonItem>
+                    <div className='d-flex flex-column'>
+                      <p className='text-muted'>
+                        <IonIcon color='primary' icon={person} />
+                        <span className='fw-bold'> Name:</span>
+                        {request.riderTwoName}
+                      </p>
+                      <p className='text-muted'>
+                        <IonIcon color='primary' icon={phonePortrait} />
+                        <span className='fw-bold'> Mobile:</span>
+                        {request.riderTwoMobile}
+                      </p>
+                      <p className='text-muted'>
+                        <IonIcon color='primary' icon={pricetag} />
+                        <span className='fw-bold'> Price:</span> $
+                        {request.price}
+                      </p>
+                    </div>
+                  </IonItem>
+
+                  <IonItemOptions side='end'>
+                    <IonItemOption onClick={(e) => acceptRide(request)}>
+                      Accept Request
+                    </IonItemOption>
+                  </IonItemOptions>
+                </IonItemSliding>
+              ))}
             </IonCardContent>
           </IonCard>
-        )} */}
+        )}
       </IonContent>
     </IonPage>
   )

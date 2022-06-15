@@ -54,10 +54,11 @@ import RideWaiting from './pages/RideWaiting'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import { RootState } from './redux/store'
 import { io } from 'socket.io-client'
+import { defaultUrl } from './config/url'
 
 setupIonicReact()
 
-let socket = io('http://192.10.11.100:3000')
+let socket = io(defaultUrl)
 
 const App: React.FC = () => {
   const [networkStatus, setNetworkStatus] = useState<boolean>(true)
@@ -101,12 +102,12 @@ const App: React.FC = () => {
     init()
   }, [])
 
-  const notification = async (d: string) => {
+  const notification = async () => {
     await LocalNotifications.schedule({
       notifications: [
         {
           title: 'Ride Request',
-          body: `${d} is requesting a ride`,
+          body: 'You have a ride request',
           id: 1,
           extra: {
             data: 'Press to open',
@@ -118,17 +119,11 @@ const App: React.FC = () => {
   }
 
   useEffect(() => {
-    socket.on('response-ride-request', async (data) => {
-      if (data.riderTwo === user) {
-        console.log('THis is the one')
-        notification(data[0].riderTwo)
-      }
-      return data
-      // console.log({ r: data[0].riderTwo, user: user })
+    socket.on(user.toString(), async (data) => {
+      notification()
+      return null
     })
-
-    // assign a cont and check thatn one is not already assigned
-  }, [])
+  }, [user])
 
   if (!networkStatus) {
     return (

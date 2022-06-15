@@ -29,8 +29,9 @@ import { useHistory } from 'react-router'
 import io from 'socket.io-client'
 import { RootState } from '../redux/store'
 import { useSelector } from 'react-redux'
+import { defaultUrl } from '../config/url'
 
-let socket = io('http://192.10.11.100:3000')
+let socket = io(defaultUrl)
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   console.log('Begin async operation')
@@ -145,10 +146,12 @@ const RiderTwoScreen: React.FC = () => {
   }
 
   const requestRide = (ride: any) => {
-    socket.emit('send-ride-request', {
+    socket.emit('ride-request', {
       _id: ride._id,
       riderOne: ride.rider,
       riderTwo: user._id,
+      riderTwoName: user.name,
+      riderTwoMobile: user.mobile,
       requestType: 'request',
     })
 

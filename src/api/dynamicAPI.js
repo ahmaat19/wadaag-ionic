@@ -1,10 +1,9 @@
 import { Storage } from '@capacitor/storage'
 import axios from 'axios'
+import { defaultUrl } from '../config/url'
 
 const dynamicAPI = async (method, url, obj = {}) => {
-  const domain = `http://192.10.11.100:3000${url}`
-  // const domain = `http://localhost:3000${url}`
-  // const domain = `https://wadaag.app${url}`
+  const domain = `${defaultUrl}${url}`
 
   const config = async () => {
     const { value } = await Storage.get({ key: 'auth' })
