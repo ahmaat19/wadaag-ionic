@@ -1,14 +1,14 @@
 import {
-  IonAvatar,
   IonButton,
   IonCard,
   IonCardContent,
   IonContent,
+  IonFab,
+  IonFabButton,
   IonIcon,
   IonItem,
   IonLabel,
   IonList,
-  IonListHeader,
   IonLoading,
   IonPage,
   IonRefresher,
@@ -19,9 +19,23 @@ import {
 } from '@ionic/react'
 
 import { useEffect, useRef, useState } from 'react'
+import useWindowDimensions from '../hooks/useWindowDimensions'
 import { Geolocation } from '@capacitor/geolocation'
-import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
-import { close, location, search, send } from 'ionicons/icons'
+import {
+  useJsApiLoader,
+  GoogleMap,
+  Autocomplete,
+  Marker,
+  DirectionsRenderer,
+} from '@react-google-maps/api'
+import {
+  arrowForwardCircle,
+  close,
+  gitCommit,
+  location,
+  search,
+  time,
+} from 'ionicons/icons'
 import useRidesHook from '../api/rides'
 import { useHistory } from 'react-router'
 
@@ -36,7 +50,7 @@ function doRefresh(event: CustomEvent<RefresherEventDetail>) {
 
 const libraries: any = ['places']
 
-const FindSharedRide: React.FC = () => {
+const RiderOneScreen: React.FC = () => {
   const [lat, setLat] = useState(0)
   const [lng, setLng] = useState(0)
   const [present] = useIonAlert()
@@ -55,22 +69,43 @@ const FindSharedRide: React.FC = () => {
     printCurrentPosition()
   }, [])
 
+  const { width, height } = useWindowDimensions()
+
+  const [origin, setOrigin] = useState({})
+  const [destination, setDestination] = useState('')
+  const [distance, setDistance] = useState('')
+  const [duration, setDuration] = useState('')
+  const [directionsResponse, setDirectionsResponse] = useState(null)
+  const [originLatLng, setOriginLatLng] = useState('')
+  const [destinationLatLng, setDestinationLatLng] = useState('')
+
   const history = useHistory()
+  const center = {
+    lat: lat,
+    lng: lng,
+  }
 
-  const origin: any = {}
-  const destination: any = ''
-
-  const { postNearRiders } = useRidesHook()
+  const { postRide, getPendingRider } = useRidesHook()
 
   const {
     isLoading: isLoadingPost,
+    isSuccess: isSuccessPost,
     isError: isErrorPost,
     error: errorPost,
     mutateAsync: mutateAsyncPost,
-    data: dataPost,
-  } = postNearRiders
+  } = postRide
 
-  // console.log(dataPost && dataPost)
+  const {
+    data: pendingRider,
+    isLoading: isLoadingPending,
+    refetch,
+  } = getPendingRider
+
+  useEffect(() => {
+    if (pendingRider) {
+      history.push('/ride-waiting')
+    }
+  }, [pendingRider, history])
 
   useEffect(() => {
     if (isErrorPost) {
@@ -79,16 +114,18 @@ const FindSharedRide: React.FC = () => {
         message: errorPost as string,
         color: 'danger',
         position: 'top',
-        duration: 5000,
+        duration: 4000,
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isErrorPost])
+  }, [isErrorPost, errorPost])
 
-  const center = {
-    lat: lat,
-    lng: lng,
-  }
+  useEffect(() => {
+    if (isSuccessPost) {
+      refetch()
+      history.replace('/waiting')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessPost])
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -97,6 +134,14 @@ const FindSharedRide: React.FC = () => {
   })
 
   function clearRoute() {
+    setOrigin({})
+    setDestination('')
+    setDistance('')
+    setDuration('')
+    setDirectionsResponse(null)
+    setOriginLatLng('')
+    setDestinationLatLng('')
+
     destinationRef.current!.value = ''
   }
 
@@ -116,11 +161,13 @@ const FindSharedRide: React.FC = () => {
       const dLan: number = results!.routes[0]!.legs[0]!.end_location!.lat()
       const dLng: number = results.routes[0]!.legs[0]!.end_location!.lng()
 
-      // @ts-ignore
-      mutateAsyncPost({
-        originLatLng: `${oLan},${oLng}`,
-        destinationLatLng: `${dLan},${dLng}`,
-      })
+      setOrigin(center)
+      setDestination(destinationRef.current!.value)
+      setDistance(results.routes[0]!.legs[0]!.distance!.text)
+      setDuration(results.routes[0]!.legs[0]!.duration!.text)
+      setDirectionsResponse(results as any)
+      setOriginLatLng(`${oLan},${oLng}`)
+      setDestinationLatLng(`${dLan},${dLng}`)
     } catch (error) {
       present({
         cssClass: 'my-css',
@@ -135,26 +182,32 @@ const FindSharedRide: React.FC = () => {
     }
   }
 
-  const requestRide = (ride: any) => {
+  const startTrip = () => {
     present({
       cssClass: 'my-css',
-      header: 'Alert',
-      message: 'Do you want to send a request to this rider?',
+      header: 'Start Trip',
+      message: 'Are you sure you want to start the trip?',
       buttons: [
         'Cancel',
         {
-          text: 'Send',
-          handler: (d) => {
-            // console.log(ride)
-            history.push(`/chat/${ride._id}`)
-          },
+          text: 'Confirm',
+          handler: () =>
+            // @ts-ignore
+            mutateAsyncPost({
+              origin: 'My Location',
+              destination: destination,
+              distance: distance,
+              duration: duration,
+              originLatLng: originLatLng,
+              destinationLatLng: destinationLatLng,
+            }),
         },
       ],
-      onDidDismiss: () => {},
+      onDidDismiss: (e) => {},
     })
   }
 
-  if (isLoadingPost || !isLoaded) {
+  if (isLoadingPost || !isLoaded || isLoadingPending) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 
@@ -164,6 +217,7 @@ const FindSharedRide: React.FC = () => {
         <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
+
         <IonCard
           className='m-0'
           style={{
@@ -207,39 +261,60 @@ const FindSharedRide: React.FC = () => {
           </IonList>
         </IonCard>
 
-        {dataPost && dataPost.length > 0 && (
-          <IonCard className='mx-0'>
+        <IonCard className='mx-0'>
+          <GoogleMap
+            center={center}
+            zoom={15}
+            mapContainerStyle={{
+              width: width,
+              height: height / 2,
+            }}
+            options={{
+              disableDefaultUI: true,
+            }}
+          >
+            <Marker position={center} />
+            {directionsResponse && (
+              <DirectionsRenderer
+                directions={directionsResponse}
+                options={{
+                  polylineOptions: {
+                    strokeColor: '#5c1a67',
+                    strokeWeight: 5,
+                    strokeOpacity: 0.8,
+                  },
+                }}
+              />
+            )}
+          </GoogleMap>
+          {duration && distance && (
             <IonCardContent>
-              <IonList>
-                <IonListHeader>
-                  <IonLabel> Near Rides </IonLabel>
-                </IonListHeader>
-                {/* @ts-ignore */}
-                {dataPost.map((ride) => (
-                  <IonItem key={ride._id}>
-                    <IonAvatar slot='start'>
-                      <img src={ride.image} alt={ride.image} />
-                    </IonAvatar>
-                    <IonLabel>
-                      <div className='d-flex justify-content-between'>
-                        <h3>{ride.name}</h3>
-                        <IonIcon
-                          onClick={(e) => requestRide(ride)}
-                          icon={send}
-                          color='primary'
-                        />
-                      </div>
-                      <p>{ride.destination}</p>
-                    </IonLabel>
-                  </IonItem>
-                ))}
-              </IonList>
+              <>
+                <p style={{ fontWeight: 'bold' }}>
+                  <IonIcon icon={time} color='primary' />{' '}
+                  <IonLabel>
+                    <span> Duration - {duration}</span>
+                  </IonLabel>
+                  <br />
+                  <IonIcon icon={gitCommit} color='primary' />{' '}
+                  <IonLabel>
+                    <span> Distance - {distance}</span>
+                  </IonLabel>
+                </p>
+              </>
             </IonCardContent>
-          </IonCard>
+          )}
+        </IonCard>
+        {origin && destination && (
+          <IonFab vertical='bottom' horizontal='end' slot='fixed'>
+            <IonFabButton color='light' onClick={startTrip}>
+              <IonIcon color='primary' icon={arrowForwardCircle} />
+            </IonFabButton>
+          </IonFab>
         )}
       </IonContent>
     </IonPage>
   )
 }
 
-export default FindSharedRide
+export default RiderOneScreen

@@ -2,8 +2,8 @@ import { Storage } from '@capacitor/storage'
 import axios from 'axios'
 
 const dynamicAPI = async (method, url, obj = {}) => {
-  // const domain = `http://192.10.11.100:3000${url}`
-  const domain = `http://localhost:3000${url}`
+  const domain = `http://192.10.11.100:3000${url}`
+  // const domain = `http://localhost:3000${url}`
   // const domain = `https://wadaag.app${url}`
 
   const config = async () => {

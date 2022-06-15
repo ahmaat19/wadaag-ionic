@@ -7,7 +7,7 @@ import {
   IonRow,
 } from '@ionic/react'
 
-const Entry: React.FC = () => {
+const HomeScreen: React.FC = () => {
   const ride1 = '/assets/images/ride1.svg'
   const ride2 = '/assets/images/ride2.svg'
 
@@ -24,7 +24,10 @@ const Entry: React.FC = () => {
 
           <IonRow>
             <IonCol>
-              <IonCard routerLink='/trip' className='text-center m-0'>
+              <IonCard
+                routerLink='/rider-one-screen'
+                className='text-center m-0'
+              >
                 <IonImg
                   src={ride1}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -38,7 +41,10 @@ const Entry: React.FC = () => {
               </IonCard>
             </IonCol>
             <IonCol>
-              <IonCard routerLink='/search' className='text-center m-0'>
+              <IonCard
+                routerLink='/rider-two-screen'
+                className='text-center m-0'
+              >
                 <IonImg
                   src={ride2}
                   className='img-fluid w-100 mx-auto card-image-top'
@@ -58,4 +64,4 @@ const Entry: React.FC = () => {
   )
 }
 
-export default Entry
+export default HomeScreen

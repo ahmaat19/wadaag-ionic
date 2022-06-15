@@ -16,8 +16,6 @@ import {
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
 import { car, golf, home, person } from 'ionicons/icons'
-import StartTrip from './pages/StartTrip'
-import Entry from './pages/Entry'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css'
@@ -42,19 +40,30 @@ import Splash from './pages/Splash'
 import OTP from './pages/OTP'
 import Profile from './pages/Profile'
 import SignUp from './pages/Signup'
-import FindSharedRide from './pages/FindSharedRide'
 import ProtectedRoute from './components/PotectedRoute'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import PublicRoute from './components/PublicRoute'
 import { Storage } from '@capacitor/storage'
 import { setUser } from './redux/userSlice'
 import Chat from './pages/Chat'
+import HomeScreen from './pages/HomeScreen'
+import RiderOneScreen from './pages/RiderOneScreen'
+import RiderTwoScreen from './pages/RiderTwoScreen'
+import RideWaiting from './pages/RideWaiting'
+
+import { LocalNotifications } from '@capacitor/local-notifications'
+import { RootState } from './redux/store'
+import { io } from 'socket.io-client'
 
 setupIonicReact()
+
+let socket = io('http://192.10.11.100:3000')
 
 const App: React.FC = () => {
   const [networkStatus, setNetworkStatus] = useState<boolean>(true)
   const dispatch = useDispatch()
+  const user = useSelector((state: RootState) => state.user._id)
+  const [response, setResponse] = useState<any>()
 
   Network.addListener('networkStatusChange', (status) => {
     setNetworkStatus(status.connected)
@@ -82,6 +91,43 @@ const App: React.FC = () => {
       }
     }
     checkPermissions()
+  }, [])
+
+  useEffect(() => {
+    async function init() {
+      await LocalNotifications.requestPermissions()
+    }
+
+    init()
+  }, [])
+
+  const notification = async (d: string) => {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          title: 'Ride Request',
+          body: `${d} is requesting a ride`,
+          id: 1,
+          extra: {
+            data: 'Press to open',
+          },
+          iconColor: '#f194ff',
+        },
+      ],
+    })
+  }
+
+  useEffect(() => {
+    socket.on('response-ride-request', async (data) => {
+      if (data.riderTwo === user) {
+        console.log('THis is the one')
+        notification(data[0].riderTwo)
+      }
+      return data
+      // console.log({ r: data[0].riderTwo, user: user })
+    })
+
+    // assign a cont and check thatn one is not already assigned
   }, [])
 
   if (!networkStatus) {
@@ -125,11 +171,24 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonTabs>
           <IonRouterOutlet>
-            <ProtectedRoute exact component={Entry} path='/home' />
-            <ProtectedRoute exact component={StartTrip} path='/trip' />
-            <ProtectedRoute exact component={FindSharedRide} path='/search' />
+            <ProtectedRoute exact component={HomeScreen} path='/home' />
+            <ProtectedRoute
+              exact
+              component={RiderOneScreen}
+              path='/rider-one-screen'
+            />
+            <ProtectedRoute
+              exact
+              component={RiderTwoScreen}
+              path='/rider-two-screen'
+            />
             <ProtectedRoute exact component={Profile} path='/profile' />
             <ProtectedRoute exact component={Chat} path='/chat/:id' />
+            <ProtectedRoute
+              exact
+              component={RideWaiting}
+              path='/ride-waiting'
+            />
 
             <Route exact path='/'>
               <Redirect to='/home' />
@@ -141,19 +200,19 @@ const App: React.FC = () => {
             <PublicRoute exact component={SignUp} path='/signup' />
           </IonRouterOutlet>
           <IonTabBar slot='bottom'>
-            <IonTabButton tab='entry' href='/home'>
+            <IonTabButton tab='home' href='/home'>
               <IonIcon icon={home} />
               <IonLabel>Home</IonLabel>
             </IonTabButton>
 
-            <IonTabButton tab='trip' href='/trip'>
+            <IonTabButton tab='riderOne' href='/rider-one-screen'>
               <IonIcon icon={golf} />
-              <IonLabel>Start Trip</IonLabel>
+              <IonLabel>Rider One</IonLabel>
             </IonTabButton>
 
-            <IonTabButton tab='search' href='/search'>
+            <IonTabButton tab='riderTwo' href='/rider-two-screen'>
               <IonIcon icon={car} />
-              <IonLabel>Ride</IonLabel>
+              <IonLabel>Rider Two</IonLabel>
             </IonTabButton>
 
             <IonTabButton tab='profile' href='/profile'>
