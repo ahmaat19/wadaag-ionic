@@ -1,69 +1,55 @@
 import {
-  IonCard,
-  IonCardContent,
-  IonChip,
+  IonAvatar,
   IonContent,
   IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
+  IonList,
+  IonListHeader,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
-  RefresherEventDetail,
 } from '@ionic/react'
-import { send } from 'ionicons/icons'
-import { useEffect } from 'react'
+import { trash } from 'ionicons/icons'
 import { useSelector } from 'react-redux'
-import { useParams } from 'react-router'
-import io from 'socket.io-client'
-import { defaultUrl } from '../config/url'
 import { RootState } from '../redux/store'
+import moment from 'moment'
+import { useHistory } from 'react-router'
 
-function doRefresh(event: CustomEvent<RefresherEventDetail>) {
-  console.log('Begin async operation')
-
-  setTimeout(() => {
-    console.log('Async operation has ended')
-    event.detail.complete()
-  }, 2000)
-}
-
-let socket = io(defaultUrl)
 const Chat: React.FC = () => {
-  const params = useParams()
-  console.log(params)
-
-  const user = useSelector((state: RootState) => state.user)
-
-  useEffect(() => {
-    socket.on('ride-accept-response', (message: string) => {
-      console.log('accept: ', message)
-    })
-  }, [])
-
-  const sendRequest = () => {
-    socket.emit('ride-request', {
-      // @ts-ignore
-      _id: params.id,
-      requestType: 'request',
-      user: user,
-    })
+  const history = useHistory()
+  const chats = useSelector((state: RootState) => state.chat)
+  const chatLink = (chat: any) => {
+    return history.push(`/chat/${chat.riderTwoId}`)
   }
-
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding' color='primary'>
-        <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
-        <IonCard>
-          <IonCardContent>
-            <p>Send Ride Request </p>
-            <IonChip onClick={sendRequest} color='success'>
-              <IonIcon icon={send} />
-              <IonLabel>Send Request</IonLabel>
-            </IonChip>
-          </IonCardContent>
-        </IonCard>
+      <IonContent fullscreen color='primary' className='ion-padding'>
+        <IonList>
+          <IonListHeader> Recent Conversation </IonListHeader>
+
+          {chats.map((chat: any) => (
+            <IonItemSliding key={chat._id} className='ion-margin-top'>
+              <IonItem onClick={(e) => chatLink(chat)}>
+                <IonAvatar slot='start'>
+                  <img src={chat.riderTwoAvatar} alt='avatar' />
+                </IonAvatar>
+                <IonLabel>
+                  <h2>{chat.riderTwoName}</h2>
+                  <p>{chat.riderTwoMobile}</p>
+                  <p>{moment(chat.createdAt).startOf('minute').fromNow()}</p>
+                </IonLabel>
+              </IonItem>
+
+              <IonItemOptions side='end'>
+                <IonItemOption onClick={(e) => console.log(chat)}>
+                  <IonIcon color='danger' icon={trash} />
+                </IonItemOption>
+              </IonItemOptions>
+            </IonItemSliding>
+          ))}
+        </IonList>
       </IonContent>
     </IonPage>
   )

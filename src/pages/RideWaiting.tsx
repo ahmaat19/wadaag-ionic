@@ -5,7 +5,6 @@ import {
   IonContent,
   IonIcon,
   IonItem,
-  IonItemDivider,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
@@ -18,12 +17,11 @@ import {
 import {
   checkmark,
   close,
-  notificationsCircle,
   person,
   phonePortrait,
   pricetag,
 } from 'ionicons/icons'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import useRidesHook from '../api/rides'
 import { RootState } from '../redux/store'
@@ -34,8 +32,7 @@ import { defaultUrl } from '../config/url'
 let socket = io(defaultUrl)
 
 const RideWaiting: React.FC = () => {
-  const user = useSelector((state: RootState) => state.user)
-  const [requestInfo, setRequestInfo] = useState<any>([])
+  const realtime = useSelector((state: RootState) => state.request)
 
   const [present] = useIonAlert()
   const [toast, dismiss] = useIonToast()
@@ -81,14 +78,6 @@ const RideWaiting: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isErrorDelete])
 
-  useEffect(() => {
-    socket.on(user._id, (data: any) => {
-      setRequestInfo([...requestInfo, data])
-    })
-  }, [requestInfo])
-
-  console.log(requestInfo && requestInfo)
-
   const cancelTrip = () => {
     present({
       cssClass: 'my-css',
@@ -132,14 +121,23 @@ const RideWaiting: React.FC = () => {
   const acceptRide = (request: any) => {
     socket.emit('ride-accept', {
       requestType: 'accept',
-      user: user,
+      rideId: request.rideId,
+      price: request.price,
+      riderOne: request.riderOne,
+      riderOneName: request.riderOneName,
+      riderOneMobile: request.riderOneMobile,
+      riderTwo: request.riderTwo,
+      riderTwoName: request.riderTwoName,
+      riderTwoMobile: request.riderTwoMobile,
     })
-  }
 
-  const deleteRideRequest = (request: any) => {
-    setRequestInfo((prev: any) =>
-      prev.filter((item: any) => item._id !== request._id)
-    )
+    toast({
+      buttons: [{ text: 'hide', handler: () => dismiss() }],
+      message: 'Request accepted',
+      color: 'success',
+      position: 'top',
+      duration: 2000,
+    })
   }
 
   if (isLoadingDelete || isLoadingPending) {
@@ -164,19 +162,14 @@ const RideWaiting: React.FC = () => {
           </IonCardContent>
         </IonCard>
 
-        {requestInfo.length > 0 && (
+        {realtime.length > 0 && (
           <IonCard>
             <IonCardContent>
               <IonLabel>You have received new ride request</IonLabel>
               <hr className='bg-info' />
 
-              {requestInfo.map((request: any, index: number) => (
+              {realtime.map((request: any, index: number) => (
                 <IonItemSliding key={index} className='ion-margin-top'>
-                  <IonItemOptions side='start'>
-                    <IonItemOption onClick={(e) => deleteRideRequest(request)}>
-                      <IonIcon color='danger' icon={close} />
-                    </IonItemOption>
-                  </IonItemOptions>
                   <IonItem>
                     <div className='d-flex flex-column'>
                       <p className='text-muted'>

@@ -15,7 +15,7 @@ import {
   IonButton,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { car, golf, home, person } from 'ionicons/icons'
+import { car, golf, home, notificationsCircle, person } from 'ionicons/icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css'
@@ -45,7 +45,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import PublicRoute from './components/PublicRoute'
 import { Storage } from '@capacitor/storage'
 import { setUser } from './redux/userSlice'
-import Chat from './pages/Chat'
 import HomeScreen from './pages/HomeScreen'
 import RiderOneScreen from './pages/RiderOneScreen'
 import RiderTwoScreen from './pages/RiderTwoScreen'
@@ -55,6 +54,11 @@ import { LocalNotifications } from '@capacitor/local-notifications'
 import { RootState } from './redux/store'
 import { io } from 'socket.io-client'
 import { defaultUrl } from './config/url'
+import { requestRideFunc } from './redux/requestSlice'
+import Chat from './pages/Chat'
+import { acceptRideFunc } from './redux/acceptSlice'
+import { setChat } from './redux/chatSlice'
+import ChatInfo from './pages/ChatInfo'
 
 setupIonicReact()
 
@@ -64,7 +68,7 @@ const App: React.FC = () => {
   const [networkStatus, setNetworkStatus] = useState<boolean>(true)
   const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.user._id)
-  const [response, setResponse] = useState<any>()
+  // const realtime = useSelector((state: RootState) => state.socket)
 
   Network.addListener('networkStatusChange', (status) => {
     setNetworkStatus(status.connected)
@@ -119,10 +123,57 @@ const App: React.FC = () => {
   }
 
   useEffect(() => {
-    socket.on(user.toString(), async (data) => {
+    socket.on(`${user.toString()}1`, async (data) => {
       notification()
+      dispatch(
+        setChat({
+          _id: data._id,
+          riderOneId: data.riderOneId,
+          riderOneName: data.riderOneName,
+          riderOneAvatar: data.riderOneAvatar,
+          riderOneMobile: data.riderOneMobile,
+
+          riderTwoId: data.riderTwoId,
+          riderTwoName: data.riderTwoName,
+          riderTwoAvatar: data.riderTwoAvatar,
+          riderTwoMobile: data.riderTwoMobile,
+
+          price: data.price,
+          message: data.message,
+          createdAt: data.createdAt,
+        })
+      )
+
       return null
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
+  useEffect(() => {
+    socket.on(`${user.toString()}2`, async (data) => {
+      notification()
+      dispatch(
+        setChat({
+          _id: data._id,
+          riderOneId: data.riderOneId,
+          riderOneName: data.riderOneName,
+          riderOneAvatar: data.riderOneAvatar,
+          riderOneMobile: data.riderOneMobile,
+
+          riderTwoId: data.riderTwoId,
+          riderTwoName: data.riderTwoName,
+          riderTwoAvatar: data.riderTwoAvatar,
+          riderTwoMobile: data.riderTwoMobile,
+
+          price: data.price,
+          message: data.message,
+          createdAt: data.createdAt,
+        })
+      )
+
+      return null
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   if (!networkStatus) {
@@ -177,8 +228,9 @@ const App: React.FC = () => {
               component={RiderTwoScreen}
               path='/rider-two-screen'
             />
+            <ProtectedRoute exact component={Chat} path='/chat' />
+            <ProtectedRoute component={ChatInfo} path='/chat/:id' />
             <ProtectedRoute exact component={Profile} path='/profile' />
-            <ProtectedRoute exact component={Chat} path='/chat/:id' />
             <ProtectedRoute
               exact
               component={RideWaiting}
@@ -208,6 +260,11 @@ const App: React.FC = () => {
             <IonTabButton tab='riderTwo' href='/rider-two-screen'>
               <IonIcon icon={car} />
               <IonLabel>Rider Two</IonLabel>
+            </IonTabButton>
+
+            <IonTabButton tab='chat' href='/chat'>
+              <IonIcon icon={notificationsCircle} />
+              <IonLabel>Chat</IonLabel>
             </IonTabButton>
 
             <IonTabButton tab='profile' href='/profile'>

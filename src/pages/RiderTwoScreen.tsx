@@ -25,11 +25,11 @@ import { Geolocation } from '@capacitor/geolocation'
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
 import { close, location, search } from 'ionicons/icons'
 import useRidesHook from '../api/rides'
-import { useHistory } from 'react-router'
 import io from 'socket.io-client'
 import { RootState } from '../redux/store'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { defaultUrl } from '../config/url'
+import { setChat } from '../redux/chatSlice'
 
 let socket = io(defaultUrl)
 
@@ -63,8 +63,8 @@ const RiderTwoScreen: React.FC = () => {
   }, [])
 
   const user = useSelector((state: RootState) => state.user)
+  const dispatch = useDispatch()
 
-  const history = useHistory()
   const [toast, dismiss] = useIonToast()
 
   const origin: any = {}
@@ -146,14 +146,50 @@ const RiderTwoScreen: React.FC = () => {
   }
 
   const requestRide = (ride: any) => {
-    socket.emit('ride-request', {
+    socket.emit('rider-two-chat', {
       _id: ride._id,
-      riderOne: ride.rider,
-      riderTwo: user._id,
+      riderOneId: ride.rider,
+      riderOneName: ride.name,
+      riderOneAvatar: ride.image,
+      riderOneMobile: ride.mobileNumber,
+
+      riderTwoId: user._id,
       riderTwoName: user.name,
+      riderTwoAvatar: user.avatar,
       riderTwoMobile: user.mobile,
-      requestType: 'request',
+
+      message: [
+        {
+          message: 'Asckm',
+          sender: user._id,
+          createdAt: new Date(),
+        },
+      ],
     })
+    const m = user.mobile.toString()
+    dispatch(
+      setChat({
+        _id: ride._id,
+        riderOneId: ride.rider,
+        riderOneName: ride.name,
+        riderOneAvatar: ride.image,
+        riderOneMobile: ride.mobileNumber,
+
+        riderTwoId: user._id,
+        riderTwoName: user.name,
+        riderTwoAvatar: user.avatar,
+        riderTwoMobile: m,
+
+        message: [
+          {
+            message: 'Asckm',
+            sender: user._id,
+            createdAt: new Date(),
+          },
+        ],
+        createdAt: new Date(),
+      } as any)
+    )
 
     toast({
       buttons: [{ text: 'hide', handler: () => dismiss() }],
