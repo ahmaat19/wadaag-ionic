@@ -1,18 +1,22 @@
 import dynamicAPI from './dynamicAPI'
-import { useQuery } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 const url = '/api/payments'
 
 const queryKey = 'payments'
 
 export default function usePaymentsHook() {
-  const getPayments = useQuery(
-    queryKey,
-    async () => await dynamicAPI('get', url, {}),
-    { retry: 0, refetchInterval: 30000 }
+  const queryClient = useQueryClient()
+
+  const postPayment = useMutation(
+    async (obj) => await dynamicAPI('post', url, obj),
+    {
+      retry: 0,
+      onSuccess: () => queryClient.invalidateQueries([queryKey]),
+    }
   )
 
   return {
-    getPayments,
+    postPayment,
   }
 }

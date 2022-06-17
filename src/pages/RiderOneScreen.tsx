@@ -117,6 +117,7 @@ const RiderOneScreen: React.FC = () => {
         duration: 4000,
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isErrorPost, errorPost])
 
   useEffect(() => {

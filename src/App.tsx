@@ -54,9 +54,7 @@ import { LocalNotifications } from '@capacitor/local-notifications'
 import { RootState } from './redux/store'
 import { io } from 'socket.io-client'
 import { defaultUrl } from './config/url'
-import { requestRideFunc } from './redux/requestSlice'
 import Chat from './pages/Chat'
-import { acceptRideFunc } from './redux/acceptSlice'
 import { setChat } from './redux/chatSlice'
 import ChatInfo from './pages/ChatInfo'
 
@@ -176,6 +174,60 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
+  useEffect(() => {
+    socket.on(`${user.toString()}message1`, async (data) => {
+      notification()
+      dispatch(
+        setChat({
+          _id: data._id,
+          riderOneId: data.riderOneId,
+          riderOneName: data.riderOneName,
+          riderOneAvatar: data.riderOneAvatar,
+          riderOneMobile: data.riderOneMobile,
+
+          riderTwoId: data.riderTwoId,
+          riderTwoName: data.riderTwoName,
+          riderTwoAvatar: data.riderTwoAvatar,
+          riderTwoMobile: data.riderTwoMobile,
+
+          price: data.price,
+          message: data.message,
+          createdAt: data.createdAt,
+        })
+      )
+
+      return null
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
+  useEffect(() => {
+    socket.on(`${user.toString()}message2`, async (data) => {
+      notification()
+      dispatch(
+        setChat({
+          _id: data._id,
+          riderOneId: data.riderOneId,
+          riderOneName: data.riderOneName,
+          riderOneAvatar: data.riderOneAvatar,
+          riderOneMobile: data.riderOneMobile,
+
+          riderTwoId: data.riderTwoId,
+          riderTwoName: data.riderTwoName,
+          riderTwoAvatar: data.riderTwoAvatar,
+          riderTwoMobile: data.riderTwoMobile,
+
+          price: data.price,
+          message: data.message,
+          createdAt: data.createdAt,
+        })
+      )
+
+      return null
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
   if (!networkStatus) {
     return (
       <div
@@ -229,8 +281,12 @@ const App: React.FC = () => {
               path='/rider-two-screen'
             />
             <ProtectedRoute exact component={Chat} path='/chat' />
-            <ProtectedRoute component={ChatInfo} path='/chat/:id' />
             <ProtectedRoute exact component={Profile} path='/profile' />
+            <ProtectedRoute
+              exact
+              component={ChatInfo}
+              path='/chat/:id/details'
+            />
             <ProtectedRoute
               exact
               component={RideWaiting}

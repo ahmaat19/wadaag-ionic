@@ -1,17 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
 import userReducer from './userSlice'
-import requestReducer from './requestSlice'
-import acceptReducer from './acceptSlice'
 import chatReducer from './chatSlice'
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
-    request: requestReducer,
-    accept: acceptReducer,
     chat: chatReducer,
   },
-  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: getDefaultMiddleware({
+    serializableCheck: false,
+  }),
+
   devTools: process.env.NODE_ENV !== 'production',
 })
 

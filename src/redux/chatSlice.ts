@@ -17,10 +17,10 @@ interface ChatState {
     {
       message: string
       sender: string
-      createdAt: any
+      createdAt: Date
     }
   ]
-  createdAt: string
+  createdAt: Date
 }
 let initialState: ChatState[] = []
 

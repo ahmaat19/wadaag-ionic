@@ -4,36 +4,18 @@ import {
   IonChip,
   IonContent,
   IonIcon,
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
   IonLabel,
   IonLoading,
   IonPage,
   useIonAlert,
   useIonToast,
 } from '@ionic/react'
-import {
-  checkmark,
-  close,
-  person,
-  phonePortrait,
-  pricetag,
-} from 'ionicons/icons'
+import { checkmark, close } from 'ionicons/icons'
 import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import useRidesHook from '../api/rides'
-import { RootState } from '../redux/store'
-import io from 'socket.io-client'
 import { useHistory } from 'react-router'
-import { defaultUrl } from '../config/url'
-
-let socket = io(defaultUrl)
 
 const RideWaiting: React.FC = () => {
-  const realtime = useSelector((state: RootState) => state.request)
-
   const [present] = useIonAlert()
   const [toast, dismiss] = useIonToast()
 
@@ -118,28 +100,6 @@ const RideWaiting: React.FC = () => {
     })
   }
 
-  const acceptRide = (request: any) => {
-    socket.emit('ride-accept', {
-      requestType: 'accept',
-      rideId: request.rideId,
-      price: request.price,
-      riderOne: request.riderOne,
-      riderOneName: request.riderOneName,
-      riderOneMobile: request.riderOneMobile,
-      riderTwo: request.riderTwo,
-      riderTwoName: request.riderTwoName,
-      riderTwoMobile: request.riderTwoMobile,
-    })
-
-    toast({
-      buttons: [{ text: 'hide', handler: () => dismiss() }],
-      message: 'Request accepted',
-      color: 'success',
-      position: 'top',
-      duration: 2000,
-    })
-  }
-
   if (isLoadingDelete || isLoadingPending) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
@@ -161,45 +121,6 @@ const RideWaiting: React.FC = () => {
             </IonChip>
           </IonCardContent>
         </IonCard>
-
-        {realtime.length > 0 && (
-          <IonCard>
-            <IonCardContent>
-              <IonLabel>You have received new ride request</IonLabel>
-              <hr className='bg-info' />
-
-              {realtime.map((request: any, index: number) => (
-                <IonItemSliding key={index} className='ion-margin-top'>
-                  <IonItem>
-                    <div className='d-flex flex-column'>
-                      <p className='text-muted'>
-                        <IonIcon color='primary' icon={person} />
-                        <span className='fw-bold'> Name:</span>
-                        {request.riderTwoName}
-                      </p>
-                      <p className='text-muted'>
-                        <IonIcon color='primary' icon={phonePortrait} />
-                        <span className='fw-bold'> Mobile:</span>
-                        {request.riderTwoMobile}
-                      </p>
-                      <p className='text-muted'>
-                        <IonIcon color='primary' icon={pricetag} />
-                        <span className='fw-bold'> Price:</span> $
-                        {request.price}
-                      </p>
-                    </div>
-                  </IonItem>
-
-                  <IonItemOptions side='end'>
-                    <IonItemOption onClick={(e) => acceptRide(request)}>
-                      Accept Request
-                    </IonItemOption>
-                  </IonItemOptions>
-                </IonItemSliding>
-              ))}
-            </IonCardContent>
-          </IonCard>
-        )}
       </IonContent>
     </IonPage>
   )

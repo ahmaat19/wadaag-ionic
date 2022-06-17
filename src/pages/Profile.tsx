@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
 import { authLogout } from '../redux/userSlice'
 import useProfilesHook from '../api/profiles'
+import usePaymentsHook from '../api/payments'
 
 const Profile: React.FC = () => {
   const history = useHistory()
@@ -46,8 +47,16 @@ const Profile: React.FC = () => {
   })
 
   const { getProfile } = useProfilesHook()
+  const { postPayment } = usePaymentsHook()
 
-  const { isLoading, isError, error, data } = getProfile
+  const { isLoading, isError, error, data, refetch } = getProfile
+  const {
+    isLoading: isLoadingPayment,
+    isError: isErrorPayment,
+    error: errorPayment,
+    isSuccess: isSuccessPayment,
+    mutateAsync: mutateAsyncPayment,
+  } = postPayment
 
   const user = useSelector((state: RootState) => state.user)
   const dispatch = useDispatch()
@@ -78,6 +87,21 @@ const Profile: React.FC = () => {
   // }, [])
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+
+  useEffect(() => {
+    if (isSuccessPayment) {
+      refetch()
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: 'Payment Verified Successful',
+        color: 'success',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessPayment])
+
   useEffect(() => {
     if (isError) {
       present({
@@ -90,6 +114,19 @@ const Profile: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError])
+
+  useEffect(() => {
+    if (isErrorPayment) {
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: errorPayment as string,
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isErrorPayment])
 
   const uploadImage = async (path: string) => {
     const response = await fetch(path)
@@ -139,10 +176,14 @@ const Profile: React.FC = () => {
     window.location.reload()
   }
 
+  const verifyPayment = () => {
+    mutateAsyncPayment()
+  }
+
   // hide ionic tabs bar bottom on profile page
   document.documentElement.style.setProperty('--ion-safe-area-bottom', '0px')
 
-  if (isLoading) {
+  if (isLoading || isLoadingPayment) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 
@@ -199,15 +240,7 @@ const Profile: React.FC = () => {
         <div className='mt-5'>
           <IonLabel className='fw-light'>Available payment method</IonLabel>
           <br />
-          <IonButton color='light' expand='block'>
-            <a
-              href='tel:*789*638744*1%23'
-              className='fw-bold text-decoration-none'
-            >
-              Pay now with your EVC wallet
-            </a>
-          </IonButton>
-          <h6 className='text-center'>OR</h6>
+
           <IonButton color='light' expand='block'>
             <a
               href='tel:*789*638744*1%23'
@@ -215,6 +248,9 @@ const Profile: React.FC = () => {
             >
               *789*638744*1#
             </a>
+          </IonButton>
+          <IonButton onClick={verifyPayment} color='success' expand='block'>
+            Verify Payment
           </IonButton>
         </div>
         <div className='position-fixed bottom-0 ion-padding-bottom'>
