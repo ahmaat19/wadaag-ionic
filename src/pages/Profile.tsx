@@ -1,21 +1,29 @@
 import {
   IonAvatar,
   IonButton,
+  IonButtons,
   IonChip,
   IonCol,
   IonContent,
   IonGrid,
   IonHeader,
   IonIcon,
+  IonInput,
+  IonItem,
   IonLabel,
   IonLoading,
+  IonModal,
   IonPage,
   IonRow,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonToolbar,
   useIonToast,
 } from '@ionic/react'
 import {
+  close,
+  create,
   filter,
   hourglass,
   logOut,
@@ -28,11 +36,16 @@ import { Camera, CameraResultType } from '@capacitor/camera'
 import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
-import { authLogout } from '../redux/userSlice'
+import { authLogout, setUser } from '../redux/userSlice'
 import useProfilesHook from '../api/profiles'
 import usePaymentsHook from '../api/payments'
+import { defaultUrl } from '../config/url'
 
-const Profile: React.FC = () => {
+interface ProfilePageProps {
+  router: HTMLIonRouterOutletElement | null
+}
+
+const Profile: React.FC<ProfilePageProps> = ({ router }) => {
   const history = useHistory()
   const [state, setState] = useState({
     name: '',
@@ -46,10 +59,25 @@ const Profile: React.FC = () => {
     isAuth: false,
   })
 
-  const { getProfile } = useProfilesHook()
+  const [userType, setUserType] = useState('')
+  const [plate, setPlate] = useState('')
+  const [license, setLicense] = useState('')
+
+  const { getProfile, postProfile } = useProfilesHook()
   const { postPayment } = usePaymentsHook()
 
+  const [showModal, setShowModal] = useState(false)
+
   const { isLoading, isError, error, data, refetch } = getProfile
+
+  const {
+    isLoading: isLoadingUpdate,
+    isError: isErrorUpdate,
+    error: errorUpdate,
+    isSuccess: isSuccessUpdate,
+    mutateAsync: mutateAsyncUpdate,
+  } = postProfile
+
   const {
     isLoading: isLoadingPayment,
     isError: isErrorPayment,
@@ -79,15 +107,6 @@ const Profile: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // useEffect(() => {
-  //   if (user.isAuth === false) {
-  //     history.push('/login')
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-
   useEffect(() => {
     if (isSuccessPayment) {
       refetch()
@@ -103,10 +122,45 @@ const Profile: React.FC = () => {
   }, [isSuccessPayment])
 
   useEffect(() => {
+    if (isSuccessUpdate) {
+      setShowModal(false)
+      dispatch(
+        setUser({
+          name: data.name,
+          avatar: image,
+          userType: userType,
+        } as any)
+      )
+      refetch()
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: 'User Profile Updated Successful',
+        color: 'success',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessUpdate])
+
+  useEffect(() => {
     if (isError) {
       present({
         buttons: [{ text: 'hide', handler: () => dismiss() }],
         message: error as string,
+        color: 'danger',
+        position: 'top',
+        duration: 5000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError])
+
+  useEffect(() => {
+    if (isErrorUpdate) {
+      present({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: errorUpdate as string,
         color: 'danger',
         position: 'top',
         duration: 5000,
@@ -136,13 +190,13 @@ const Profile: React.FC = () => {
       const file = new File([blob], 'image.png', { type: 'image/png' })
       const formData = new FormData()
       formData.append('file', file)
-      const response = await fetch('https://wadaag.app/api/upload?type=image', {
+      const response = await fetch(`${defaultUrl}/api/upload?type=image`, {
         method: 'POST',
         body: formData,
       })
       const json = await response.json()
       if (json) {
-        setImage(`https://wadaag.app${json.filePaths[0].path}`)
+        setImage(`${defaultUrl}${json.filePaths[0].path}`)
       }
     }
   }
@@ -180,10 +234,20 @@ const Profile: React.FC = () => {
     mutateAsyncPayment()
   }
 
+  const updateUser = () => {
+    mutateAsyncUpdate({
+      image,
+      name: state.name,
+      userType,
+      plate,
+      license,
+    } as any)
+  }
+
   // hide ionic tabs bar bottom on profile page
   document.documentElement.style.setProperty('--ion-safe-area-bottom', '0px')
 
-  if (isLoading || isLoadingPayment) {
+  if (isLoading || isLoadingPayment || isLoadingUpdate) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 
@@ -195,23 +259,127 @@ const Profile: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className='ion-padding' color='primary'>
+        <IonModal
+          isOpen={showModal}
+          // @ts-ignore
+          cssClass='my-custom-modal-css'
+          swipeToClose={true}
+          presentingElement={router || undefined}
+          onDidDismiss={() => setShowModal(false)}
+        >
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Update User Profile</IonTitle>
+              <IonButtons slot='end'>
+                <IonButton onClick={() => setShowModal(false)}>
+                  <IonIcon slot='icon-only' icon={close} />
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+
+          <IonContent className='ion-padding'>
+            <IonAvatar
+              onClick={takePicture}
+              className='bg-light'
+              style={{ width: 100, height: 100, margin: 'auto' }}
+            >
+              <img
+                src={image || (data && data.image)}
+                className=''
+                alt='logo'
+              />
+            </IonAvatar>
+
+            <IonItem lines='full'>
+              <IonLabel position='floating'>Name</IonLabel>
+              <IonInput
+                type='text'
+                value={state.name || (data && data.name)}
+                onIonChange={(e) => {
+                  setState({ ...state, name: e.detail.value! })
+                }}
+              />
+            </IonItem>
+            <IonItem lines='full'>
+              <IonLabel position='floating'>User Type</IonLabel>
+              <IonSelect
+                value={userType || (data && data.userType)}
+                onIonChange={(e) => {
+                  setUserType(e.detail.value)
+                }}
+              >
+                <IonSelectOption value='rider'>Rider</IonSelectOption>
+                <IonSelectOption value='driver'>Driver</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+
+            {userType === 'driver' && (
+              <>
+                <IonItem lines='full'>
+                  <IonLabel position='floating'>Plate</IonLabel>
+                  <IonInput
+                    type='text'
+                    value={plate || (data && data.plate)}
+                    onIonChange={(e) => {
+                      setPlate(e.detail.value!)
+                    }}
+                  />
+                </IonItem>
+
+                <IonItem lines='full'>
+                  <IonLabel position='floating'>License</IonLabel>
+                  <IonInput
+                    type='text'
+                    value={license || (data && data.license)}
+                    onIonChange={(e) => {
+                      setLicense(e.detail.value!)
+                    }}
+                  />
+                </IonItem>
+              </>
+            )}
+
+            <IonButton
+              className='mt-3'
+              expand='block'
+              onClick={() => updateUser()}
+            >
+              Update
+            </IonButton>
+          </IonContent>
+        </IonModal>
         <IonGrid>
           <IonRow>
             <IonCol size='4' className='my-auto'>
               <IonAvatar
                 onClick={takePicture}
-                className='bg-light display-1 fs-1 w-75 h-75'
+                className='bg-light'
+                style={{ width: 80, height: 80 }}
               >
-                <img
-                  src={(data && data.image) || image}
-                  className='display-1 fs-1'
-                  alt='logo'
-                />
+                <img src={(data && data.image) || image} alt='logo' />
               </IonAvatar>
             </IonCol>
-            <IonCol size='7'>
-              <span className='fs-3 fw-bold'>{state.name}</span>
-              <h6 className='mt-2 fw-light'>{state.userType?.toUpperCase()}</h6>
+            <IonCol size='6'>
+              <span className='fs-3 fw-bold'>
+                {(data && data.name.toUpperCase()) || state.name.toUpperCase()}
+              </span>
+              <p>
+                <span>{state.mobile}</span> <br />
+                <span>
+                  {' '}
+                  {(data && data.userType.toUpperCase()) ||
+                    state.userType.toUpperCase()}
+                </span>
+              </p>
+            </IonCol>
+            <IonCol
+              // onClick={() => openCardModal()}
+              onClick={() => setShowModal(true)}
+              size='1'
+              className='my-auto'
+            >
+              <IonIcon icon={create} size='large' />
             </IonCol>
           </IonRow>
         </IonGrid>

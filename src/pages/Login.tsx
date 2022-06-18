@@ -24,7 +24,7 @@ const Login: React.FC = () => {
 
   const { postLogin } = useAuthHook()
 
-  const { isLoading, isError, error, mutateAsync, isSuccess, data } = postLogin
+  const { isLoading, isError, error, mutateAsync, isSuccess } = postLogin
 
   const getAuth = async () => {
     const { value } = await Storage.get({ key: 'auth' })
@@ -43,7 +43,6 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(data.otp)
       history.push('/otp')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

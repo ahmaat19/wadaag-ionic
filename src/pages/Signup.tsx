@@ -28,13 +28,12 @@ const SignUp: React.FC = () => {
 
   const { postUser } = useAuthHook()
 
-  const { isLoading, isError, error, mutateAsync, isSuccess, data } = postUser
+  const { isLoading, isError, error, mutateAsync, isSuccess } = postUser
 
   const history = useHistory()
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(data.otp)
       history.push('/otp')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

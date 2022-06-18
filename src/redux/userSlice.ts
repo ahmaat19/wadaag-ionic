@@ -32,16 +32,16 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<UserState>) => {
-      state._id = action.payload._id
-      state.name = action.payload.name
-      state.avatar = action.payload.avatar
-      state.userType = action.payload.userType
-      state.mobile = action.payload.mobile
-      state.points = action.payload.points
-      state.expiration = action.payload.expiration
-      state.level = action.payload.level
+      state._id = action.payload._id || state._id
+      state.name = action.payload.name || state.name
+      state.avatar = action.payload.avatar || state.avatar
+      state.userType = action.payload.userType || state.userType
+      state.mobile = action.payload.mobile || state.mobile
+      state.points = action.payload.points || state.points
+      state.expiration = action.payload.expiration || state.expiration
+      state.level = action.payload.level || state.level
       state.isAuth = true
-      state.token = action.payload.token
+      state.token = action.payload.token || state.token
 
       const setAuth = async () => {
         const value = {

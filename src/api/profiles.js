@@ -16,17 +16,6 @@ export default function useProfilesHook() {
     { retry: 3 }
   )
 
-  // const getUserProfiles = useQuery(
-  //   'user profiles',
-  //   async () =>
-  //     await dynamicAPI(
-  //       'get',
-  //       `${url}/user-profiles?page=${page}&q=${q}&limit=${limit}`,
-  //       {}
-  //     ),
-  //   { retry: 0 }
-  // )
-
   const postProfile = useMutation(
     async (obj) => await dynamicAPI('post', `${url}/profile`, obj),
     {
@@ -37,7 +26,6 @@ export default function useProfilesHook() {
 
   return {
     getProfile,
-    // getUserProfiles,
     postProfile,
   }
 }
