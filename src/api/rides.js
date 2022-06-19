@@ -47,11 +47,19 @@ export default function useRidesHook(props) {
     }
   )
 
+  const checkPlate = useMutation(
+    async (obj) => await dynamicAPI('post', `${url}/plate`, obj),
+    {
+      retry: 0,
+    }
+  )
+
   return {
     getPendingRider,
     updateRide,
     deleteRide,
     postRide,
     postNearRiders,
+    checkPlate,
   }
 }

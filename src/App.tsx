@@ -13,9 +13,10 @@ import {
   IonTabs,
   setupIonicReact,
   IonButton,
+  IonPage,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { car, golf, home, notificationsCircle, person } from 'ionicons/icons'
+import { chatbubbleEllipses, home, person } from 'ionicons/icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css'
@@ -66,7 +67,6 @@ const App: React.FC = () => {
   const [networkStatus, setNetworkStatus] = useState<boolean>(true)
   const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.user._id)
-  // const realtime = useSelector((state: RootState) => state.socket)
 
   Network.addListener('networkStatusChange', (status) => {
     setNetworkStatus(status.connected)
@@ -230,25 +230,29 @@ const App: React.FC = () => {
 
   if (!networkStatus) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          flexDirection: 'column',
-        }}
-        className='ion-text-center ion-padding text-light'
-      >
-        <IonButton expand='block' color='danger'>
-          No network connection
-        </IonButton>
+      <IonApp>
+        <IonPage>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+              flexDirection: 'column',
+            }}
+            className='ion-text-center ion-padding text-light'
+          >
+            <IonButton expand='block' color='danger'>
+              No network connection
+            </IonButton>
 
-        <h1>No internet connection</h1>
-        <IonLabel>
-          Please check your internet connection and try again.
-        </IonLabel>
-      </div>
+            <h1>No internet connection</h1>
+            <IonLabel>
+              Please check your internet connection and try again.
+            </IonLabel>
+          </div>
+        </IonPage>
+      </IonApp>
     )
   }
 
@@ -308,18 +312,8 @@ const App: React.FC = () => {
               <IonLabel>Home</IonLabel>
             </IonTabButton>
 
-            <IonTabButton tab='riderOne' href='/rider-one-screen'>
-              <IonIcon icon={golf} />
-              <IonLabel>Rider One</IonLabel>
-            </IonTabButton>
-
-            <IonTabButton tab='riderTwo' href='/rider-two-screen'>
-              <IonIcon icon={car} />
-              <IonLabel>Rider Two</IonLabel>
-            </IonTabButton>
-
             <IonTabButton tab='chat' href='/chat'>
-              <IonIcon icon={notificationsCircle} />
+              <IonIcon icon={chatbubbleEllipses} />
               <IonLabel>Chat</IonLabel>
             </IonTabButton>
 

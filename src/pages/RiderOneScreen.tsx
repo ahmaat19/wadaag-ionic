@@ -6,6 +6,7 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
+  IonInput,
   IonItem,
   IonLabel,
   IonList,
@@ -30,6 +31,7 @@ import {
 } from '@react-google-maps/api'
 import {
   arrowForwardCircle,
+  car,
   close,
   gitCommit,
   location,
@@ -78,6 +80,7 @@ const RiderOneScreen: React.FC = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null)
   const [originLatLng, setOriginLatLng] = useState('')
   const [destinationLatLng, setDestinationLatLng] = useState('')
+  const [plate, setPlate] = useState('')
 
   const history = useHistory()
   const center = {
@@ -85,7 +88,7 @@ const RiderOneScreen: React.FC = () => {
     lng: lng,
   }
 
-  const { postRide, getPendingRider } = useRidesHook()
+  const { postRide, getPendingRider, checkPlate } = useRidesHook()
 
   const {
     isLoading: isLoadingPost,
@@ -94,6 +97,15 @@ const RiderOneScreen: React.FC = () => {
     error: errorPost,
     mutateAsync: mutateAsyncPost,
   } = postRide
+
+  const {
+    isLoading: isLoadingPlate,
+    isSuccess: isSuccessPlate,
+    isError: isErrorPlate,
+    error: errorPlate,
+    mutateAsync: mutateAsyncPlate,
+    data: plateData,
+  } = checkPlate
 
   const {
     data: pendingRider,
@@ -119,6 +131,19 @@ const RiderOneScreen: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isErrorPost, errorPost])
+
+  useEffect(() => {
+    if (isErrorPlate) {
+      toast({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: errorPlate as string,
+        color: 'danger',
+        position: 'top',
+        duration: 4000,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isErrorPlate, errorPlate])
 
   useEffect(() => {
     if (isSuccessPost) {
@@ -169,6 +194,8 @@ const RiderOneScreen: React.FC = () => {
       setDirectionsResponse(results as any)
       setOriginLatLng(`${oLan},${oLng}`)
       setDestinationLatLng(`${dLan},${dLng}`)
+
+      checkDriverPlate()
     } catch (error) {
       present({
         cssClass: 'my-css',
@@ -183,17 +210,58 @@ const RiderOneScreen: React.FC = () => {
     }
   }
 
+  // const submit = () => {
+  //   mutateAsyncPost({
+  //     plate,
+  //     originLatLng,
+  //     destinationLatLng,
+  //     origin,
+  //     destination,
+  //     distance,
+  //     duration,
+  //   } as any)
+  // }
+
+  // // @ts-ignore
+  // useEffect(() => {
+  //   if (isSuccessPlate) {
+  //     return toast({
+  //       buttons: [{ text: 'hide', handler: () => dismiss() }],
+  //       message: 'Plate has found',
+  //       color: 'success',
+  //       position: 'top',
+  //       duration: 5000,
+  //     })
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isSuccessPlate])
+
+  const checkDriverPlate = () => {
+    if (!plate) {
+      return toast({
+        buttons: [{ text: 'hide', handler: () => dismiss() }],
+        message: 'Please enter plate number',
+        color: 'danger',
+        position: 'top',
+        duration: 4000,
+      })
+    }
+
+    mutateAsyncPlate({ plate } as any)
+  }
+
   const startTrip = () => {
     present({
       cssClass: 'my-css',
-      header: 'Start Trip',
-      message: 'Are you sure you want to start the trip?',
+      header: 'Plate Checking',
+      message: isSuccessPlate
+        ? `Driver Number (${plateData.mobileNumber})`
+        : 'Plate not found',
       buttons: [
         'Cancel',
         {
           text: 'Confirm',
           handler: () =>
-            // @ts-ignore
             mutateAsyncPost({
               origin: 'My Location',
               destination: destination,
@@ -201,14 +269,15 @@ const RiderOneScreen: React.FC = () => {
               duration: duration,
               originLatLng: originLatLng,
               destinationLatLng: destinationLatLng,
-            }),
+              plate: plate,
+            } as any),
         },
       ],
       onDidDismiss: (e) => {},
     })
   }
 
-  if (isLoadingPost || !isLoaded || isLoadingPending) {
+  if (isLoadingPost || !isLoaded || isLoadingPending || isLoadingPlate) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 
@@ -250,15 +319,26 @@ const RiderOneScreen: React.FC = () => {
                 )}
               </IonItem>
             </Autocomplete>
+            <IonItem>
+              <IonIcon slot='start' icon={car} color='primary' />
+              <IonInput
+                placeholder='Plate Number'
+                inputmode='text'
+                type='text'
+                value={plate}
+                onIonChange={(e) => setPlate(e.detail.value!)}
+              />
+            </IonItem>
             <div style={{ marginLeft: 30 }}>
               <IonButton
+                disabled={!plate}
                 onClick={submitHandler}
                 style={{ float: 'right', width: '100%', marginTop: 20 }}
               >
                 <IonIcon slot='start' icon={search} />
                 <IonLabel>SEARCH</IonLabel>
               </IonButton>
-            </div>{' '}
+            </div>
           </IonList>
         </IonCard>
 
@@ -268,7 +348,7 @@ const RiderOneScreen: React.FC = () => {
             zoom={15}
             mapContainerStyle={{
               width: width,
-              height: height / 2,
+              height: height / 2 - 85,
             }}
             options={{
               disableDefaultUI: true,
