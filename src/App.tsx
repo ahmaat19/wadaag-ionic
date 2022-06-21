@@ -52,6 +52,7 @@ import RiderTwoScreen from './pages/RiderTwoScreen'
 import RideWaiting from './pages/RideWaiting'
 
 import { LocalNotifications } from '@capacitor/local-notifications'
+
 import { RootState } from './redux/store'
 import { io } from 'socket.io-client'
 import { defaultUrl } from './config/url'
@@ -82,17 +83,13 @@ const App: React.FC = () => {
   }, [networkStatus])
 
   useEffect(() => {
-    const check = async () => {
-      const status = await Geolocation.checkPermissions()
-      return status
-    }
-
     const checkPermissions = async () => {
-      const status = await check()
+      const status = await Geolocation.checkPermissions()
       if (status.location !== 'granted') {
         await Geolocation.requestPermissions()
       }
     }
+
     checkPermissions()
   }, [])
 
@@ -108,7 +105,7 @@ const App: React.FC = () => {
     await LocalNotifications.schedule({
       notifications: [
         {
-          title: 'Ride Request',
+          title: 'New Notification',
           body: 'You have a ride request',
           id: 1,
           extra: {

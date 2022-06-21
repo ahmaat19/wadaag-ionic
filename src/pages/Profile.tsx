@@ -27,8 +27,8 @@ import {
   filter,
   hourglass,
   logOut,
-  statsChart,
-  swapVertical,
+  // statsChart,
+  // swapVertical,
 } from 'ionicons/icons'
 import { useEffect, useState } from 'react'
 
@@ -256,6 +256,12 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
       <IonHeader>
         <IonToolbar color='primary'>
           <IonTitle>Profile</IonTitle>
+          <IonButtons slot='end'>
+            <IonChip onClick={logout} className='bg-light fw-light'>
+              <IonIcon icon={logOut} color='primary' />
+              <IonLabel color='primary'>Logout</IonLabel>
+            </IonChip>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className='ion-padding' color='primary'>
@@ -263,7 +269,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
           isOpen={showModal}
           // @ts-ignore
           cssClass='my-custom-modal-css'
-          swipeToClose={true}
+          canDismiss={true}
           presentingElement={router || undefined}
           onDidDismiss={() => setShowModal(false)}
         >
@@ -361,16 +367,16 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
               </IonAvatar>
             </IonCol>
             <IonCol size='6'>
-              <span className='fs-3 fw-bold'>
+              <span className='fs-6 fw-bold'>
                 {(data && data.name.toUpperCase()) || state.name.toUpperCase()}
               </span>
               <p>
-                <span>{state.mobile}</span> <br />
-                <span>
+                <IonLabel className='fw-light'>{state.mobile}</IonLabel>
+                <IonLabel className='fw-light'>
                   {' '}
                   {(data && data.userType.toUpperCase()) ||
                     state.userType.toUpperCase()}
-                </span>
+                </IonLabel>
               </p>
             </IonCol>
             <IonCol
@@ -383,7 +389,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
             </IonCol>
           </IonRow>
         </IonGrid>
-        <hr className='bg-light' />
+        {/* <hr className='bg-light' />
         <IonLabel className='fw-light'>My Status</IonLabel> <br />
         <IonChip className='bg-light fw-bold'>
           <IonIcon icon={statsChart} color='primary' />
@@ -392,7 +398,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
         <IonChip className='bg-light fw-bold float-end'>
           <IonIcon icon={swapVertical} color='primary' />
           <IonLabel color='primary'>{data && data.points} Points</IonLabel>
-        </IonChip>
+        </IonChip> */}
         <hr className='bg-light' />
         <IonLabel className='fw-light'>Payments</IonLabel> <br />
         <IonChip className='bg-light fw-bold'>
@@ -405,28 +411,32 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
             {data && data.expiration} days remaining
           </IonLabel>
         </IonChip>
-        <div className='mt-5'>
-          <IonLabel className='fw-light'>Available payment method</IonLabel>
-          <br />
+        {data && data.expiration === 0 && (
+          <div className='mt-5'>
+            <IonLabel className='fw-light'>
+              Your subscription has expired, please click the bellow button and
+              verify after you send.
+            </IonLabel>
+            <br />
 
-          <IonButton color='light' expand='block'>
-            <a
-              href='tel:*789*638744*1%23'
-              className='fw-bold text-decoration-none'
+            <IonButton color='light' expand='block'>
+              <a
+                href='tel:*789*638744*1%23'
+                className='fw-bold text-decoration-none'
+              >
+                *789*638744*1#
+              </a>
+            </IonButton>
+            <IonButton
+              className='mt-2'
+              onClick={verifyPayment}
+              color='success'
+              expand='block'
             >
-              *789*638744*1#
-            </a>
-          </IonButton>
-          <IonButton onClick={verifyPayment} color='success' expand='block'>
-            Verify Payment
-          </IonButton>
-        </div>
-        <div className='position-fixed bottom-0 ion-padding-bottom'>
-          <IonChip onClick={logout} className='bg-light fw-bold'>
-            <IonIcon icon={logOut} color='primary' />
-            <IonLabel color='primary'>Logout</IonLabel>
-          </IonChip>
-        </div>
+              Verify Payment
+            </IonButton>
+          </div>
+        )}
       </IonContent>
     </IonPage>
   )
