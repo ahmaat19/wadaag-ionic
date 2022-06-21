@@ -32,8 +32,8 @@ const Chat: React.FC = () => {
           <IonList>
             <IonListHeader> Recent Conversation </IonListHeader>
 
-            {chats.map((chat: any) => (
-              <IonItemSliding key={chat._id} className='ion-margin-top'>
+            {chats.map((chat: any, index: number) => (
+              <IonItemSliding key={index} className='ion-margin-top'>
                 <IonItem onClick={(e) => chatLink(chat)}>
                   <IonAvatar slot='start'>
                     <img
