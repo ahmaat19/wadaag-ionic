@@ -5,18 +5,18 @@ import { Geolocation } from '@capacitor/geolocation'
 import { useEffect, useState } from 'react'
 import {
   IonApp,
-  IonIcon,
+  // IonIcon,
   IonLabel,
   IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
+  // IonTabBar,
+  // IonTabButton,
+  // IonTabs,
   setupIonicReact,
   IonButton,
   IonPage,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { chatbubbleEllipses, home, person } from 'ionicons/icons'
+// import { chatbubbleEllipses, home, person } from 'ionicons/icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css'
@@ -268,42 +268,34 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonTabs>
-          <IonRouterOutlet>
-            <ProtectedRoute exact component={HomeScreen} path='/home' />
-            <ProtectedRoute
-              exact
-              component={RiderOneScreen}
-              path='/rider-one-screen'
-            />
-            <ProtectedRoute
-              exact
-              component={RiderTwoScreen}
-              path='/rider-two-screen'
-            />
-            <ProtectedRoute exact component={Chat} path='/chat' />
-            <ProtectedRoute exact component={Profile} path='/profile' />
-            <ProtectedRoute
-              exact
-              component={ChatInfo}
-              path='/chat/:id/details'
-            />
-            <ProtectedRoute
-              exact
-              component={RideWaiting}
-              path='/ride-waiting'
-            />
+        {/* <IonTabs> */}
+        <IonRouterOutlet>
+          <ProtectedRoute exact component={HomeScreen} path='/home' />
+          <ProtectedRoute
+            exact
+            component={RiderOneScreen}
+            path='/rider-one-screen'
+          />
+          <ProtectedRoute
+            exact
+            component={RiderTwoScreen}
+            path='/rider-two-screen'
+          />
+          <ProtectedRoute exact component={Chat} path='/chat' />
+          <ProtectedRoute exact component={Profile} path='/profile' />
+          <ProtectedRoute exact component={ChatInfo} path='/chat/:id/details' />
+          <ProtectedRoute exact component={RideWaiting} path='/ride-waiting' />
 
-            <Route exact path='/'>
-              <Redirect to='/home' />
-            </Route>
+          <Route exact path='/'>
+            <Redirect to='/home' />
+          </Route>
 
-            <PublicRoute exact component={Login} path='/login' />
-            <PublicRoute exact component={Splash} path='/splash' />
-            <PublicRoute exact component={OTP} path='/otp' />
-            <PublicRoute exact component={SignUp} path='/signup' />
-          </IonRouterOutlet>
-          <IonTabBar slot='bottom'>
+          <PublicRoute exact component={Login} path='/login' />
+          <PublicRoute exact component={Splash} path='/splash' />
+          <PublicRoute exact component={OTP} path='/otp' />
+          <PublicRoute exact component={SignUp} path='/signup' />
+        </IonRouterOutlet>
+        {/* <IonTabBar slot='bottom'>
             <IonTabButton tab='home' href='/home'>
               <IonIcon icon={home} />
               <IonLabel>Home</IonLabel>
@@ -318,8 +310,8 @@ const App: React.FC = () => {
               <IonIcon icon={person} />
               <IonLabel>Profile</IonLabel>
             </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
+          </IonTabBar> */}
+        {/* </IonTabs> */}
       </IonReactRouter>
     </IonApp>
   )

@@ -1,25 +1,33 @@
 import { IonButton, IonContent, IonPage } from '@ionic/react'
+import { style } from '../components/Style'
 
 const Splash: React.FC = () => {
+  const logo = 'assets/icon/icon.png'
+
   return (
     <IonPage>
-      <IonContent fullscreen color='primary' className='ion-padding'>
-        <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
-          <h1 className='text-center display-4 fw-bold ion-color-primary'>
-            Welcome to <span className='text-warning'>WADAAG</span> Ride Sharing
-          </h1>
-          <p className='text-center'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
-            sequi atque quisquam fuga neque.
-          </p>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <div className='d-flex justify-content-center align-items-center flex-column h-100'>
+            <div className='text-center'>
+              <img src={logo} alt='logo' className='w-25 img-fluid rounded-5' />
+            </div>
+            <h2
+              color='primary'
+              className='text-center fw-light ion-text-primary fs-1 text-uppercase'
+            >
+              Welcome to <span className='fw-bold'>wadaag</span>
+            </h2>
 
-          <div className='position-fixed bottom-0 w-100 ion-padding'>
-            <IonButton routerLink='/login' color='light' className='w-100'>
-              Log In
-            </IonButton>
-            <IonButton routerLink='/signup' color='light' className='w-100'>
-              Sign Up
-            </IonButton>
+            <div className='position-fixed bottom-0 w-100 ion-padding'>
+              <IonButton
+                fill='outline'
+                routerLink='/login'
+                className='w-100 m-auto'
+              >
+                GET STARTED
+              </IonButton>
+            </div>
           </div>
         </div>
       </IonContent>

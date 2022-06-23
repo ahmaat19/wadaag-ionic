@@ -1,25 +1,29 @@
 import {
-  IonButton,
+  IonCol,
   IonContent,
-  IonIcon,
+  IonGrid,
   IonInput,
-  IonItem,
+  IonLabel,
   IonLoading,
   IonPage,
+  IonRow,
   useIonToast,
 } from '@ionic/react'
-import { mail } from 'ionicons/icons'
-import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { setUser } from '../redux/userSlice'
 import useAuthHook from '../api/auth'
+import { style } from '../components/Style'
 
 const OTP: React.FC = () => {
   const history = useHistory()
-  const [OTP, setOTP] = useState<number>()
+  const [one, setOne] = useState<number>()
+  const [two, setTwo] = useState<number>()
+  const [three, setThree] = useState<number>()
+  const [four, setFour] = useState<number>()
+
   const [present, dismiss] = useIonToast()
 
   const { postOTP } = useAuthHook()
@@ -64,60 +68,65 @@ const OTP: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError])
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (OTP) {
-      // @ts-ignore
-      mutateAsync({ otp: OTP })
-    } else {
-      present({
-        buttons: [{ text: 'hide', handler: () => dismiss() }],
-        message: 'Invalid OTP',
-        color: 'danger',
-        position: 'top',
-        duration: 5000,
-      })
+  useEffect(() => {
+    if (one && two && three && four) {
+      mutateAsync({ otp: `${one}${two}${three}${four}` } as any)
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [one, two, three, four])
 
   if (isLoading) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
   return (
     <IonPage>
-      <IonContent fullscreen color='primary' className='ion-padding'>
-        <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
-          <h1 className='text-center display-4 fw-bold ion-color-primary'>
-            OTP Confirmation
-          </h1>
-          <p className='text-center'>
-            We sent you an OTP on your registered mobile number. Please enter
-            the OTP
-          </p>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <div className='d-flex justify-content-center flex-column h-100'>
+            <div>
+              <h2 className='fw-light ion-color-primary'> OTP VERIFICATION</h2>
+              <IonLabel>
+                We have sent the OTP verification to your mobile number
+              </IonLabel>
 
-          <form onSubmit={handleSubmit} className='w-100 '>
-            <IonItem className='rounded-3'>
-              <IonIcon slot='start' icon={mail} color='primary' />
-              <IonInput
-                value={OTP}
-                onIonChange={(e) => setOTP(e.target.value as number)}
-                type='number'
-                placeholder='******'
-                inputMode='numeric'
-              />
-            </IonItem>
-            <IonButton type='submit' color='light' className='w-100 mt-4'>
-              Confirm
-            </IonButton>
-          </form>
-
-          <div className='position-fixed bottom-0 w-100 ion-padding'>
-            <Link
-              to='/signup'
-              className='fw-bold fs-5 float-end text-light text-decoration-none'
-            >
-              Sign Up
-            </Link>
+              <IonGrid>
+                <IonRow>
+                  <IonCol>
+                    <IonInput
+                      inputMode='numeric'
+                      value={one}
+                      onIonChange={(e: any) => setOne(e.detail.value!)}
+                      className='border text-center'
+                    />
+                  </IonCol>
+                  <IonCol>
+                    <IonInput
+                      inputMode='numeric'
+                      value={two}
+                      onIonChange={(e: any) => setTwo(e.detail.value!)}
+                      className='border text-center'
+                      autofocus
+                    />
+                  </IonCol>
+                  <IonCol>
+                    <IonInput
+                      inputMode='numeric'
+                      value={three}
+                      onIonChange={(e: any) => setThree(e.detail.value!)}
+                      className='border text-center'
+                    />
+                  </IonCol>
+                  <IonCol>
+                    <IonInput
+                      inputMode='numeric'
+                      value={four}
+                      onIonChange={(e: any) => setFour(e.detail.value!)}
+                      className='border text-center'
+                    />
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </div>
           </div>
         </div>
       </IonContent>

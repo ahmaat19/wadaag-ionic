@@ -4,6 +4,7 @@ import {
   IonIcon,
   IonInput,
   IonItem,
+  IonLabel,
   IonLoading,
   IonPage,
   useIonToast,
@@ -15,6 +16,7 @@ import { Storage } from '@capacitor/storage'
 import { useEffect, useState } from 'react'
 
 import useAuthHook from '../api/auth'
+import { style } from '../components/Style'
 // import {useForm} from 'react-hook-form'
 
 const Login: React.FC = () => {
@@ -43,7 +45,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      history.push('/otp')
+      history.push(`/otp`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
@@ -82,43 +84,40 @@ const Login: React.FC = () => {
   }
   return (
     <IonPage>
-      <IonContent fullscreen color='primary' className='ion-padding'>
-        <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
-          <h1 className='text-center display-4 fw-bold ion-color-primary'>
-            Login
-          </h1>
-          <p className='text-center'>
-            Please login with your mobile number if you have an account.
-          </p>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <div className='d-flex justify-content-center flex-column h-100'>
+            <h2 className='fw-light ion-color-primary'>LOGIN</h2>
 
-          <form onSubmit={handleSubmit} className='w-100 '>
-            <IonItem className='rounded-3'>
-              <IonIcon slot='start' icon={call} color='primary' />
-              <IonInput
-                value={mobile}
-                onIonChange={(e) => setMobile(e.target.value as number)}
-                inputMode='numeric'
-                type='number'
-                placeholder='e.g. 615301507'
-              />
-            </IonItem>
-            <IonButton
-              type='submit'
-              // onClick={(e) => handleSubmit(e as any)}
-              color='light'
-              className='w-100 mt-4'
-            >
-              Login
-            </IonButton>
-          </form>
+            <form onSubmit={handleSubmit}>
+              <IonItem className='bg-transparent'>
+                <IonLabel position='floating'>
+                  <IonIcon icon={call} color='primary' /> Mobile Number
+                </IonLabel>
+                <IonInput
+                  value={mobile}
+                  onIonChange={(e: any) => setMobile(e.detail.value)}
+                  inputMode='numeric'
+                  type='number'
+                  autofocus
+                />
+              </IonItem>
+              <IonButton
+                type='submit'
+                className='mt-4 m-auto'
+                fill='outline'
+                expand='block'
+              >
+                LOGIN
+              </IonButton>
+            </form>
 
-          <div className='position-fixed bottom-0 w-100 ion-padding'>
-            <Link
-              to='/signup'
-              className='fw-bold fs-5 float-end text-light text-decoration-none'
-            >
-              Sign Up
-            </Link>
+            <div className='position-fixed bottom-0 end-0 pb-3 pe-3'>
+              Don't have an account?{' '}
+              <Link to='/signup' className='fw-bold text-decoration-none'>
+                Sign Up
+              </Link>
+            </div>
           </div>
         </div>
       </IonContent>
