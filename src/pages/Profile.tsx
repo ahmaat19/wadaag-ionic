@@ -1,5 +1,6 @@
 import {
   IonAvatar,
+  IonBackButton,
   IonButton,
   IonButtons,
   IonChip,
@@ -40,6 +41,7 @@ import { authLogout, setUser } from '../redux/userSlice'
 import useProfilesHook from '../api/profiles'
 import usePaymentsHook from '../api/payments'
 import { defaultUrl } from '../config/url'
+import { style } from '../components/Style'
 
 interface ProfilePageProps {
   router: HTMLIonRouterOutletElement | null
@@ -253,9 +255,11 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar color='primary'>
-          <IonTitle>Profile</IonTitle>
+      <IonHeader collapse='fade' translucent className='ion-no-border'>
+        <IonToolbar>
+          <IonButtons slot='start'>
+            <IonBackButton defaultHref='/' />
+          </IonButtons>
           <IonButtons slot='end'>
             <IonChip onClick={logout} className='bg-light fw-light'>
               <IonIcon icon={logOut} color='primary' />
@@ -264,27 +268,103 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className='ion-padding' color='primary'>
-        <IonModal
-          isOpen={showModal}
-          // @ts-ignore
-          cssClass='my-custom-modal-css'
-          canDismiss={true}
-          presentingElement={router || undefined}
-          onDidDismiss={() => setShowModal(false)}
-        >
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Update User Profile</IonTitle>
-              <IonButtons slot='end'>
-                <IonButton onClick={() => setShowModal(false)}>
-                  <IonIcon slot='icon-only' icon={close} />
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <IonGrid>
+            <IonRow>
+              <IonCol size='4' className='my-auto'>
+                <IonAvatar
+                  className='bg-light'
+                  style={{ width: 80, height: 80 }}
+                >
+                  <img src={(data && data.image) || image} alt='logo' />
+                </IonAvatar>
+              </IonCol>
+              <IonCol size='6'>
+                <span className='fs-6 fw-bold'>
+                  {(data && data.name.toUpperCase()) ||
+                    state.name.toUpperCase()}
+                </span>
+                <p>
+                  <IonLabel className='fw-light'>{state.mobile}</IonLabel>
+                  <br />
+                  <IonLabel className='fw-light'>
+                    {(data && data.userType.toUpperCase()) ||
+                      state.userType.toUpperCase()}
+                  </IonLabel>
+                </p>
+              </IonCol>
+              <IonCol
+                onClick={() => setShowModal(true)}
+                size='1'
+                className='my-auto'
+              >
+                <IonIcon icon={create} size='large' />
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+          <hr className='bg-primary' />
+          <IonLabel className='fw-light'>Payments</IonLabel> <br />
+          <IonChip className='shadow bg-light fw-bold'>
+            <IonIcon icon={filter} color='primary' />
+            <IonLabel color='primary'>Transactions</IonLabel>
+          </IonChip>
+          <IonChip className='shadow bg-light fw-bold float-end'>
+            <IonIcon icon={hourglass} color='primary' />
+            <IonLabel color='primary'>
+              {data && data.expiration} days remaining
+            </IonLabel>
+          </IonChip>
+          <div className='position-fixed bottom-0 end-0 pb-3 pe-3 ion-padding'>
+            {data && data.expiration === 0 && (
+              <div>
+                <IonLabel className='fw-light'>
+                  Your subscription has expired, please click the bellow button
+                  and verify after you send.
+                </IonLabel>
+                <br />
 
-          <IonContent className='ion-padding'>
+                <IonButton className='my-3' expand='block' fill='outline'>
+                  <a
+                    href='tel:*789*638744*1%23'
+                    className='fw-bold text-decoration-none'
+                  >
+                    *789*638744*1#
+                  </a>
+                </IonButton>
+                <IonButton
+                  onClick={verifyPayment}
+                  color='primary'
+                  expand='block'
+                >
+                  VERIFY PAYMENT
+                </IonButton>
+              </div>
+            )}
+          </div>
+        </div>
+      </IonContent>
+
+      <IonModal
+        isOpen={showModal}
+        // @ts-ignore
+        cssClass='my-custom-modal-css'
+        canDismiss={true}
+        presentingElement={router || undefined}
+        onDidDismiss={() => setShowModal(false)}
+      >
+        <IonHeader collapse='fade' translucent className='ion-no-border'>
+          <IonToolbar>
+            <IonTitle>Update User Profile</IonTitle>
+            <IonButtons slot='end'>
+              <IonButton onClick={() => setShowModal(false)}>
+                <IonIcon slot='icon-only' icon={close} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent fullscreen>
+          <div className='h-100 ion-padding' style={style.background}>
             <IonAvatar
               onClick={takePicture}
               className='bg-light'
@@ -297,7 +377,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
               />
             </IonAvatar>
 
-            <IonItem lines='full'>
+            <IonItem lines='full' className='bg-transparent'>
               <IonLabel position='floating'>Name</IonLabel>
               <IonInput
                 type='text'
@@ -307,7 +387,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
                 }}
               />
             </IonItem>
-            <IonItem lines='full'>
+            <IonItem lines='full' className='bg-transparent'>
               <IonLabel position='floating'>User Type</IonLabel>
               <IonSelect
                 value={userType || (data && data.userType)}
@@ -322,7 +402,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
 
             {userType === 'driver' && (
               <>
-                <IonItem lines='full'>
+                <IonItem lines='full' className='bg-transparent'>
                   <IonLabel position='floating'>Plate</IonLabel>
                   <IonInput
                     type='text'
@@ -333,7 +413,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
                   />
                 </IonItem>
 
-                <IonItem lines='full'>
+                <IonItem lines='full' className='bg-transparent'>
                   <IonLabel position='floating'>License</IonLabel>
                   <IonInput
                     type='text'
@@ -349,95 +429,14 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
             <IonButton
               className='mt-3'
               expand='block'
+              fill='outline'
               onClick={() => updateUser()}
             >
-              Update
-            </IonButton>
-          </IonContent>
-        </IonModal>
-        <IonGrid>
-          <IonRow>
-            <IonCol size='4' className='my-auto'>
-              <IonAvatar
-                onClick={takePicture}
-                className='bg-light'
-                style={{ width: 80, height: 80 }}
-              >
-                <img src={(data && data.image) || image} alt='logo' />
-              </IonAvatar>
-            </IonCol>
-            <IonCol size='6'>
-              <span className='fs-6 fw-bold'>
-                {(data && data.name.toUpperCase()) || state.name.toUpperCase()}
-              </span>
-              <p>
-                <IonLabel className='fw-light'>{state.mobile}</IonLabel>
-                <IonLabel className='fw-light'>
-                  {' '}
-                  {(data && data.userType.toUpperCase()) ||
-                    state.userType.toUpperCase()}
-                </IonLabel>
-              </p>
-            </IonCol>
-            <IonCol
-              // onClick={() => openCardModal()}
-              onClick={() => setShowModal(true)}
-              size='1'
-              className='my-auto'
-            >
-              <IonIcon icon={create} size='large' />
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-        {/* <hr className='bg-light' />
-        <IonLabel className='fw-light'>My Status</IonLabel> <br />
-        <IonChip className='bg-light fw-bold'>
-          <IonIcon icon={statsChart} color='primary' />
-          <IonLabel color='primary'>Level {data && data.level}</IonLabel>
-        </IonChip>
-        <IonChip className='bg-light fw-bold float-end'>
-          <IonIcon icon={swapVertical} color='primary' />
-          <IonLabel color='primary'>{data && data.points} Points</IonLabel>
-        </IonChip> */}
-        <hr className='bg-light' />
-        <IonLabel className='fw-light'>Payments</IonLabel> <br />
-        <IonChip className='bg-light fw-bold'>
-          <IonIcon icon={filter} color='primary' />
-          <IonLabel color='primary'>Transactions</IonLabel>
-        </IonChip>
-        <IonChip className='bg-light fw-bold float-end'>
-          <IonIcon icon={hourglass} color='primary' />
-          <IonLabel color='primary'>
-            {data && data.expiration} days remaining
-          </IonLabel>
-        </IonChip>
-        {data && data.expiration === 0 && (
-          <div className='mt-5'>
-            <IonLabel className='fw-light'>
-              Your subscription has expired, please click the bellow button and
-              verify after you send.
-            </IonLabel>
-            <br />
-
-            <IonButton color='light' expand='block'>
-              <a
-                href='tel:*789*638744*1%23'
-                className='fw-bold text-decoration-none'
-              >
-                *789*638744*1#
-              </a>
-            </IonButton>
-            <IonButton
-              className='mt-2'
-              onClick={verifyPayment}
-              color='success'
-              expand='block'
-            >
-              Verify Payment
+              UPDATE
             </IonButton>
           </div>
-        )}
-      </IonContent>
+        </IonContent>
+      </IonModal>
     </IonPage>
   )
 }

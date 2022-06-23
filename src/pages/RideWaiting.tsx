@@ -1,19 +1,24 @@
 import {
+  IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonChip,
   IonContent,
+  IonHeader,
   IonIcon,
   IonLabel,
   IonLoading,
   IonPage,
+  IonToolbar,
   useIonAlert,
   useIonToast,
 } from '@ionic/react'
-import { checkmark, close } from 'ionicons/icons'
+import { checkmark, chevronBack, close, personCircle } from 'ionicons/icons'
 import { useEffect } from 'react'
 import useRidesHook from '../api/rides'
 import { useHistory } from 'react-router'
+import { style } from '../components/Style'
 
 const RideWaiting: React.FC = () => {
   const [present] = useIonAlert()
@@ -106,21 +111,46 @@ const RideWaiting: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding' color='primary'>
-        <IonCard>
-          <IonCardContent>
-            <p>You have uncompleted ride </p>
-            <IonChip onClick={completeTrip} color='success'>
-              <IonIcon icon={checkmark} />
-              <IonLabel>Complete Ride</IonLabel>
-            </IonChip>
+      <IonHeader collapse='fade' translucent className='ion-no-border'>
+        <IonToolbar>
+          <IonButtons slot='start'>
+            <IonButton routerLink='/'>
+              <IonIcon
+                slot='icon-only'
+                icon={chevronBack}
+                size='large'
+                color='primary'
+              />
+              Back
+            </IonButton>
+          </IonButtons>
+          <IonButtons slot='end'>
+            <IonButton routerLink='/profile'>
+              <IonIcon slot='icon-only' icon={personCircle} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent fullscreen>
+        <div
+          className='h-100 d-flex justify-content-center align-items-center ion-padding'
+          style={style.background}
+        >
+          <IonCard className='bg-transparent shadow-lg'>
+            <IonCardContent>
+              <p>You have uncompleted ride </p>
+              <IonChip className='my-3' onClick={completeTrip} color='success'>
+                <IonIcon icon={checkmark} />
+                <IonLabel>Complete Ride</IonLabel>
+              </IonChip>
 
-            <IonChip onClick={cancelTrip} color='danger'>
-              <IonIcon icon={close} />
-              <IonLabel>Cancel Ride</IonLabel>
-            </IonChip>
-          </IonCardContent>
-        </IonCard>
+              <IonChip onClick={cancelTrip} color='danger'>
+                <IonIcon icon={close} />
+                <IonLabel>Cancel Ride</IonLabel>
+              </IonChip>
+            </IonCardContent>
+          </IonCard>
+        </div>
       </IonContent>
     </IonPage>
   )

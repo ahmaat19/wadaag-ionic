@@ -1,9 +1,12 @@
 import {
   IonAvatar,
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonContent,
+  IonHeader,
   IonIcon,
   IonItem,
   IonItemOption,
@@ -15,6 +18,7 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  IonToolbar,
   RefresherEventDetail,
   useIonAlert,
   useIonToast,
@@ -23,13 +27,14 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { Geolocation } from '@capacitor/geolocation'
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
-import { close, location, search } from 'ionicons/icons'
+import { close, location, personCircle, search, send } from 'ionicons/icons'
 import useRidesHook from '../api/rides'
 import io from 'socket.io-client'
 import { RootState } from '../redux/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { defaultUrl } from '../config/url'
 import { setChat } from '../redux/chatSlice'
+import { style } from '../components/Style'
 
 let socket = io(defaultUrl)
 
@@ -206,82 +211,101 @@ const RiderTwoScreen: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding' color='primary'>
-        <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
-        <IonCard
-          className='m-0'
-          style={{
-            marginTop: 5,
-            paddingRight: 20,
-            paddingTop: 10,
-            paddingBottom: 10,
-          }}
-        >
-          <IonList>
-            <Autocomplete>
-              <IonItem>
-                <IonIcon slot='start' icon={location} color='primary' />
-                <input
-                  placeholder='Where are you going to day?'
-                  type='text'
-                  ref={destinationRef}
-                  defaultValue={destination}
-                  className='border-0 w-100 bg-transparent'
-                  style={{ outline: 'none' }}
-                />
-                {origin && destination && (
-                  <IonIcon
-                    slot='end'
-                    icon={close}
-                    color='danger'
-                    onClick={clearRoute}
+      <IonHeader collapse='fade' translucent className='ion-no-border'>
+        <IonToolbar>
+          <IonButtons slot='start'>
+            <IonBackButton defaultHref='/' />
+          </IonButtons>
+          <IonButtons slot='end'>
+            <IonButton routerLink='/profile'>
+              <IonIcon slot='icon-only' icon={personCircle} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
+            <IonRefresherContent></IonRefresherContent>
+          </IonRefresher>
+          <IonCard
+            className='m-0 bg-transparent shadow-lg'
+            style={{
+              marginTop: 5,
+              paddingRight: 20,
+              paddingTop: 10,
+              paddingBottom: 10,
+            }}
+          >
+            <IonList className='bg-transparent'>
+              <Autocomplete>
+                <IonItem className='bg-transparent'>
+                  <IonIcon slot='start' icon={location} color='primary' />
+                  <input
+                    placeholder='Where are you going to day?'
+                    type='text'
+                    ref={destinationRef}
+                    defaultValue={destination}
+                    className='border-0 w-100 bg-transparent'
+                    style={{ outline: 'none' }}
                   />
-                )}
-              </IonItem>
-            </Autocomplete>
-            <div style={{ marginLeft: 30 }}>
-              <IonButton
-                onClick={submitHandler}
-                style={{ float: 'right', width: '100%', marginTop: 20 }}
-              >
-                <IonIcon slot='start' icon={search} />
-                <IonLabel>SEARCH</IonLabel>
-              </IonButton>
-            </div>{' '}
-          </IonList>
-        </IonCard>
-
-        {dataPost && dataPost.length > 0 && (
-          <IonCard className='mx-0'>
-            <IonCardContent>
-              <IonList>
-                {/* @ts-ignore */}
-                {dataPost.map((ride) => (
-                  <IonItemSliding key={ride._id}>
-                    <IonItem>
-                      <IonAvatar slot='start'>
-                        <img src={ride.image} alt={ride.image} />
-                      </IonAvatar>
-                      <IonLabel>
-                        <h3>{ride.name}</h3>
-
-                        <p>{ride.destination}</p>
-                      </IonLabel>
-                    </IonItem>
-
-                    <IonItemOptions side='end'>
-                      <IonItemOption onClick={(e) => requestRide(ride)}>
-                        Send Request
-                      </IonItemOption>
-                    </IonItemOptions>
-                  </IonItemSliding>
-                ))}
-              </IonList>
-            </IonCardContent>
+                  {origin && destination && (
+                    <IonIcon
+                      slot='end'
+                      icon={close}
+                      color='danger'
+                      onClick={clearRoute}
+                    />
+                  )}
+                </IonItem>
+              </Autocomplete>
+              <div style={{ marginLeft: 30 }}>
+                <IonButton
+                  fill='outline'
+                  onClick={submitHandler}
+                  style={{ float: 'right', width: '100%', marginTop: 20 }}
+                >
+                  <IonIcon slot='start' icon={search} />
+                  <IonLabel>SEARCH</IonLabel>
+                </IonButton>
+              </div>{' '}
+            </IonList>
           </IonCard>
-        )}
+
+          {dataPost && dataPost.length > 0 && (
+            <IonCard className='mx-0 bg-transparent shadow-lg'>
+              <IonCardContent>
+                <IonList className='bg-transparent'>
+                  {/* @ts-ignore */}
+                  {dataPost.map((ride) => (
+                    <IonItemSliding key={ride._id}>
+                      <IonItem className='bg-transparent'>
+                        <IonAvatar slot='start'>
+                          <img src={ride.image} alt={ride.image} />
+                        </IonAvatar>
+                        <IonLabel>
+                          <h3>{ride.name}</h3>
+
+                          <p>{ride.destination}</p>
+                        </IonLabel>
+                      </IonItem>
+
+                      <IonItemOptions className='bg-transparent' side='end'>
+                        <IonItemOption
+                          className='bg-transparent'
+                          onClick={(e) => requestRide(ride)}
+                        >
+                          <IonIcon slot='start' color='primary' icon={send} />{' '}
+                          <IonLabel color='primary'>send</IonLabel>
+                        </IonItemOption>
+                      </IonItemOptions>
+                    </IonItemSliding>
+                  ))}
+                </IonList>
+              </IonCardContent>
+            </IonCard>
+          )}
+        </div>
       </IonContent>
     </IonPage>
   )

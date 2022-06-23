@@ -1,63 +1,67 @@
 import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
   IonCard,
   IonCol,
   IonContent,
-  IonImg,
+  IonHeader,
+  IonIcon,
+  IonLabel,
   IonPage,
   IonRow,
+  IonToolbar,
 } from '@ionic/react'
+import { personCircle } from 'ionicons/icons'
+import { style } from '../components/Style'
 
 const HomeScreen: React.FC = () => {
-  const ride1 = '/assets/images/ride1.svg'
-  const ride2 = '/assets/images/ride2.svg'
-
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding' color='primary'>
-        <div className='d-flex justify-content-center align-items-center flex-column h-100 text-light'>
-          <h1 className='text-center display-4 fw-bold ion-color-primary'>
-            How do you ride today?
-          </h1>
-          <p className='text-center'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
-
-          <IonRow>
-            <IonCol>
-              <IonCard
-                routerLink='/rider-one-screen'
-                className='text-center m-0'
+      <IonHeader collapse='fade' translucent className='ion-no-border'>
+        <IonToolbar>
+          <IonButtons slot='start'>
+            <IonBackButton defaultHref='/' />
+          </IonButtons>
+          <IonButtons slot='end'>
+            <IonButton routerLink='/profile'>
+              <IonIcon slot='icon-only' icon={personCircle} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <div className='d-flex justify-content-center flex-column h-100 '>
+            <IonRow>
+              <IonCol
+                size='10'
+                style={{ width: '200px', height: '200px' }}
+                className='mx-auto'
               >
-                <IonImg
-                  src={ride1}
-                  className='img-fluid w-100 mx-auto card-image-top'
-                />
-                <span
-                  className='text-center fw-bold'
-                  style={{ color: 'purple' }}
+                <IonCard
+                  routerLink='/rider-one-screen'
+                  className='text-center bg-transparent shadow-lg mx-auto d-flex justify-content-center align-items-center'
+                  style={{ width: '60%', height: '80%' }}
                 >
-                  1<sup>st</sup> Ride
-                </span>
-              </IonCard>
-            </IonCol>
-            <IonCol>
-              <IonCard
-                routerLink='/rider-two-screen'
-                className='text-center m-0'
+                  <IonLabel className='fs-3 fw-light'>FIRST RIDE</IonLabel>
+                </IonCard>
+              </IonCol>
+              <IonCol
+                size='10'
+                style={{ width: '200px', height: '200px' }}
+                className='mx-auto'
               >
-                <IonImg
-                  src={ride2}
-                  className='img-fluid w-100 mx-auto card-image-top'
-                />
-                <span
-                  className='text-center fw-bold'
-                  style={{ color: 'purple' }}
+                <IonCard
+                  routerLink='/rider-two-screen'
+                  className='text-center bg-transparent shadow-lg mx-auto d-flex justify-content-center align-items-center'
+                  style={{ width: '60%', height: '80%' }}
                 >
-                  2<sup>nd</sup> Ride
-                </span>
-              </IonCard>
-            </IonCol>
-          </IonRow>
+                  <IonLabel className='fs-3 fw-light'>SECOND RIDE</IonLabel>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          </div>
         </div>
       </IonContent>
     </IonPage>

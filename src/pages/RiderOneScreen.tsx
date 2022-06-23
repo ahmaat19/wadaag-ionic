@@ -1,10 +1,13 @@
 import {
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonContent,
   IonFab,
   IonFabButton,
+  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
@@ -14,6 +17,7 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  IonToolbar,
   RefresherEventDetail,
   useIonAlert,
   useIonToast,
@@ -35,11 +39,13 @@ import {
   close,
   gitCommit,
   location,
+  personCircle,
   search,
   time,
 } from 'ionicons/icons'
 import useRidesHook from '../api/rides'
 import { useHistory } from 'react-router'
+import { style } from '../components/Style'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   console.log('Begin async operation')
@@ -283,116 +289,131 @@ const RiderOneScreen: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding' color='primary'>
-        <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
+      <IonHeader collapse='fade' translucent className='ion-no-border'>
+        <IonToolbar>
+          <IonButtons slot='start'>
+            <IonBackButton defaultHref='/' />
+          </IonButtons>
+          <IonButtons slot='end'>
+            <IonButton routerLink='/profile'>
+              <IonIcon slot='icon-only' icon={personCircle} />
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
+            <IonRefresherContent></IonRefresherContent>
+          </IonRefresher>
 
-        <IonCard
-          className='m-0'
-          style={{
-            marginTop: 5,
-            paddingRight: 20,
-            paddingTop: 10,
-            paddingBottom: 10,
-          }}
-        >
-          <IonList>
-            <Autocomplete>
-              <IonItem>
-                <IonIcon slot='start' icon={location} color='primary' />
-                <input
-                  placeholder='Where are you going to day?'
-                  type='text'
-                  ref={destinationRef}
-                  defaultValue={destination}
-                  className='border-0 w-100 bg-transparent'
-                  style={{ outline: 'none' }}
-                />
-                {origin && destination && (
-                  <IonIcon
-                    slot='end'
-                    icon={close}
-                    color='danger'
-                    onClick={clearRoute}
-                  />
-                )}
-              </IonItem>
-            </Autocomplete>
-            <IonItem>
-              <IonIcon slot='start' icon={car} color='primary' />
-              <IonInput
-                placeholder='Plate Number'
-                inputmode='text'
-                type='text'
-                value={plate}
-                onIonChange={(e) => setPlate(e.detail.value!)}
-              />
-            </IonItem>
-            <div style={{ marginLeft: 30 }}>
-              <IonButton
-                disabled={!plate}
-                onClick={submitHandler}
-                style={{ float: 'right', width: '100%', marginTop: 20 }}
-              >
-                <IonIcon slot='start' icon={search} />
-                <IonLabel>SEARCH</IonLabel>
-              </IonButton>
-            </div>
-          </IonList>
-        </IonCard>
-
-        <IonCard className='mx-0'>
-          <GoogleMap
-            center={center}
-            zoom={15}
-            mapContainerStyle={{
-              width: width,
-              height: height / 2 - 85,
-            }}
-            options={{
-              disableDefaultUI: true,
+          <IonCard
+            className='m-0 bg-transparent shadow-lg'
+            style={{
+              marginTop: 5,
+              paddingRight: 20,
+              paddingTop: 10,
+              paddingBottom: 10,
             }}
           >
-            <Marker position={center} />
-            {directionsResponse && (
-              <DirectionsRenderer
-                directions={directionsResponse}
-                options={{
-                  polylineOptions: {
-                    strokeColor: '#5c1a67',
-                    strokeWeight: 5,
-                    strokeOpacity: 0.8,
-                  },
-                }}
-              />
+            <IonList className='bg-transparent'>
+              <Autocomplete>
+                <IonItem className='bg-transparent'>
+                  <IonIcon slot='start' icon={location} color='primary' />
+                  <input
+                    placeholder='Where are you going to day?'
+                    type='text'
+                    ref={destinationRef}
+                    defaultValue={destination}
+                    className='border-0 w-100 bg-transparent'
+                    style={{ outline: 'none' }}
+                  />
+                  {origin && destination && (
+                    <IonIcon
+                      slot='end'
+                      icon={close}
+                      color='danger'
+                      onClick={clearRoute}
+                    />
+                  )}
+                </IonItem>
+              </Autocomplete>
+              <IonItem className='bg-transparent'>
+                <IonIcon slot='start' icon={car} color='primary' />
+                <IonInput
+                  placeholder='Plate Number'
+                  inputMode='text'
+                  type='text'
+                  value={plate}
+                  onIonChange={(e) => setPlate(e.detail.value!)}
+                />
+              </IonItem>
+              <div style={{ marginLeft: 30 }}>
+                <IonButton
+                  fill='outline'
+                  disabled={!plate}
+                  onClick={submitHandler}
+                  style={{ float: 'right', width: '100%', marginTop: 20 }}
+                >
+                  <IonIcon slot='start' icon={search} />
+                  <IonLabel>SEARCH</IonLabel>
+                </IonButton>
+              </div>
+            </IonList>
+          </IonCard>
+
+          <IonCard className='mx-0'>
+            <GoogleMap
+              center={center}
+              zoom={15}
+              mapContainerStyle={{
+                width: width,
+                height: height / 2 - 85,
+              }}
+              options={{
+                disableDefaultUI: true,
+              }}
+            >
+              <Marker position={center} />
+              {directionsResponse && (
+                <DirectionsRenderer
+                  directions={directionsResponse}
+                  options={{
+                    polylineOptions: {
+                      strokeColor: '#5c1a67',
+                      strokeWeight: 5,
+                      strokeOpacity: 0.8,
+                    },
+                  }}
+                />
+              )}
+            </GoogleMap>
+            {duration && distance && (
+              <IonCardContent>
+                <>
+                  <p style={{ fontWeight: 'bold' }}>
+                    <IonIcon icon={time} color='primary' />{' '}
+                    <IonLabel>
+                      <span> Duration - {duration}</span>
+                    </IonLabel>
+                    <br />
+                    <IonIcon icon={gitCommit} color='primary' />{' '}
+                    <IonLabel>
+                      <span> Distance - {distance}</span>
+                    </IonLabel>
+                  </p>
+                </>
+              </IonCardContent>
             )}
-          </GoogleMap>
-          {duration && distance && (
-            <IonCardContent>
-              <>
-                <p style={{ fontWeight: 'bold' }}>
-                  <IonIcon icon={time} color='primary' />{' '}
-                  <IonLabel>
-                    <span> Duration - {duration}</span>
-                  </IonLabel>
-                  <br />
-                  <IonIcon icon={gitCommit} color='primary' />{' '}
-                  <IonLabel>
-                    <span> Distance - {distance}</span>
-                  </IonLabel>
-                </p>
-              </>
-            </IonCardContent>
+          </IonCard>
+          {origin && destination && (
+            <IonFab vertical='bottom' horizontal='end' slot='fixed'>
+              <IonFabButton color='light' onClick={startTrip}>
+                <IonIcon color='primary' icon={arrowForwardCircle} />
+              </IonFabButton>
+            </IonFab>
           )}
-        </IonCard>
-        {origin && destination && (
-          <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-            <IonFabButton color='light' onClick={startTrip}>
-              <IonIcon color='primary' icon={arrowForwardCircle} />
-            </IonFabButton>
-          </IonFab>
-        )}
+        </div>
       </IonContent>
     </IonPage>
   )
