@@ -1,35 +1,18 @@
 import {
-  IonBackButton,
-  IonButton,
-  IonButtons,
   IonCard,
   IonCol,
   IonContent,
-  IonHeader,
-  IonIcon,
   IonLabel,
   IonPage,
   IonRow,
-  IonToolbar,
 } from '@ionic/react'
-import { personCircle } from 'ionicons/icons'
+import Header from '../components/Header'
 import { style } from '../components/Style'
 
 const HomeScreen: React.FC = () => {
   return (
     <IonPage>
-      <IonHeader collapse='fade' translucent className='ion-no-border'>
-        <IonToolbar>
-          <IonButtons slot='start'>
-            <IonBackButton defaultHref='/' />
-          </IonButtons>
-          <IonButtons slot='end'>
-            <IonButton routerLink='/profile'>
-              <IonIcon slot='icon-only' icon={personCircle} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <Header profile={true} nativeBack={true} />
       <IonContent fullscreen>
         <div className='h-100 ion-padding' style={style.background}>
           <div className='d-flex justify-content-center flex-column h-100 '>
@@ -44,7 +27,7 @@ const HomeScreen: React.FC = () => {
                   className='text-center bg-transparents shadow-lg mx-auto d-flex justify-content-center align-items-center'
                   style={{ width: '60%', height: '80%', ...style.bg_purple }}
                 >
-                  <IonLabel className='fs-3 fw-light'>FIRST RIDE</IonLabel>
+                  <IonLabel className='fs-5 fw-light'>FIRST RIDE</IonLabel>
                 </IonCard>
               </IonCol>
               <IonCol
@@ -57,7 +40,7 @@ const HomeScreen: React.FC = () => {
                   className='text-center bg-transparent shadow-lg mx-auto d-flex justify-content-center align-items-center'
                   style={{ width: '60%', height: '80%' }}
                 >
-                  <IonLabel className='fs-3 fw-light'>SECOND RIDE</IonLabel>
+                  <IonLabel className='fs-5 fw-light'>SECOND RIDE</IonLabel>
                 </IonCard>
               </IonCol>
             </IonRow>

@@ -1,24 +1,21 @@
 import {
-  IonButton,
-  IonButtons,
   IonCard,
   IonCardContent,
   IonChip,
   IonContent,
-  IonHeader,
   IonIcon,
   IonLabel,
   IonLoading,
   IonPage,
-  IonToolbar,
   useIonAlert,
   useIonToast,
 } from '@ionic/react'
-import { checkmark, chevronBack, close, personCircle } from 'ionicons/icons'
+import { checkmark, close } from 'ionicons/icons'
 import { useEffect } from 'react'
 import useRidesHook from '../api/rides'
 import { useHistory } from 'react-router'
 import { style } from '../components/Style'
+import Header from '../components/Header'
 
 const RideWaiting: React.FC = () => {
   const [present] = useIonAlert()
@@ -111,26 +108,8 @@ const RideWaiting: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader collapse='fade' translucent className='ion-no-border'>
-        <IonToolbar>
-          <IonButtons slot='start'>
-            <IonButton routerLink='/'>
-              <IonIcon
-                slot='icon-only'
-                icon={chevronBack}
-                size='large'
-                color='primary'
-              />
-              Back
-            </IonButton>
-          </IonButtons>
-          <IonButtons slot='end'>
-            <IonButton routerLink='/profile'>
-              <IonIcon slot='icon-only' icon={personCircle} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <Header profile={true} nativeBack={false} />
+
       <IonContent fullscreen>
         <div
           className='h-100 d-flex justify-content-center align-items-center ion-padding'

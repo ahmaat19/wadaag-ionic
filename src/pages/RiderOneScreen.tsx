@@ -1,13 +1,10 @@
 import {
-  IonBackButton,
   IonButton,
-  IonButtons,
   IonCard,
   IonCardContent,
   IonContent,
   IonFab,
   IonFabButton,
-  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
@@ -17,7 +14,6 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonToolbar,
   RefresherEventDetail,
   useIonAlert,
   useIonToast,
@@ -39,13 +35,13 @@ import {
   close,
   gitCommit,
   location,
-  personCircle,
   search,
   time,
 } from 'ionicons/icons'
 import useRidesHook from '../api/rides'
 import { useHistory } from 'react-router'
 import { style } from '../components/Style'
+import Header from '../components/Header'
 
 function doRefresh(event: CustomEvent<RefresherEventDetail>) {
   console.log('Begin async operation')
@@ -216,32 +212,6 @@ const RiderOneScreen: React.FC = () => {
     }
   }
 
-  // const submit = () => {
-  //   mutateAsyncPost({
-  //     plate,
-  //     originLatLng,
-  //     destinationLatLng,
-  //     origin,
-  //     destination,
-  //     distance,
-  //     duration,
-  //   } as any)
-  // }
-
-  // // @ts-ignore
-  // useEffect(() => {
-  //   if (isSuccessPlate) {
-  //     return toast({
-  //       buttons: [{ text: 'hide', handler: () => dismiss() }],
-  //       message: 'Plate has found',
-  //       color: 'success',
-  //       position: 'top',
-  //       duration: 5000,
-  //     })
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isSuccessPlate])
-
   const checkDriverPlate = () => {
     if (!plate) {
       return toast({
@@ -289,18 +259,7 @@ const RiderOneScreen: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader collapse='fade' translucent className='ion-no-border'>
-        <IonToolbar>
-          <IonButtons slot='start'>
-            <IonBackButton defaultHref='/' />
-          </IonButtons>
-          <IonButtons slot='end'>
-            <IonButton routerLink='/profile'>
-              <IonIcon slot='icon-only' icon={personCircle} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <Header profile={true} nativeBack={true} />
       <IonContent fullscreen>
         <div className='h-100 ion-padding' style={style.background}>
           <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>

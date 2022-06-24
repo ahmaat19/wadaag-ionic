@@ -1,12 +1,9 @@
 import {
   IonAvatar,
-  IonBackButton,
   IonButton,
-  IonButtons,
   IonCard,
   IonCardContent,
   IonContent,
-  IonHeader,
   IonIcon,
   IonItem,
   IonItemOption,
@@ -18,7 +15,6 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonToolbar,
   RefresherEventDetail,
   useIonAlert,
   useIonToast,
@@ -27,7 +23,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { Geolocation } from '@capacitor/geolocation'
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api'
-import { close, location, personCircle, search, send } from 'ionicons/icons'
+import { close, location, search, send } from 'ionicons/icons'
 import useRidesHook from '../api/rides'
 import io from 'socket.io-client'
 import { RootState } from '../redux/store'
@@ -35,6 +31,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { defaultUrl } from '../config/url'
 import { setChat } from '../redux/chatSlice'
 import { style } from '../components/Style'
+import Header from '../components/Header'
 
 let socket = io(defaultUrl)
 
@@ -211,18 +208,8 @@ const RiderTwoScreen: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader collapse='fade' translucent className='ion-no-border'>
-        <IonToolbar>
-          <IonButtons slot='start'>
-            <IonBackButton defaultHref='/' />
-          </IonButtons>
-          <IonButtons slot='end'>
-            <IonButton routerLink='/profile'>
-              <IonIcon slot='icon-only' icon={personCircle} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <Header profile={true} nativeBack={true} />
+
       <IonContent fullscreen>
         <div className='h-100 ion-padding' style={style.background}>
           <IonRefresher slot='fixed' onIonRefresh={doRefresh} color='primary'>
@@ -295,8 +282,12 @@ const RiderTwoScreen: React.FC = () => {
                           className='bg-transparent'
                           onClick={(e) => requestRide(ride)}
                         >
-                          <IonIcon slot='start' color='primary' icon={send} />{' '}
-                          <IonLabel color='primary'>send</IonLabel>
+                          <IonIcon
+                            size='large'
+                            slot='start'
+                            color='primary'
+                            icon={send}
+                          />{' '}
                         </IonItemOption>
                       </IonItemOptions>
                     </IonItemSliding>

@@ -19,6 +19,8 @@ import io from 'socket.io-client'
 import { defaultUrl } from '../config/url'
 import { setChat } from '../redux/chatSlice'
 import { useEffect, useState } from 'react'
+import Header from '../components/Header'
+import { style } from '../components/Style'
 
 let socket = io(defaultUrl)
 
@@ -156,85 +158,91 @@ const ChatInfo: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen color='primary' className='ion-padding'>
-        <div
-          className='rounded-5 mb-2'
-          style={{
-            overflow: 'auto',
-            height: 'calc(100vh - 127px)',
-          }}
-          id='chat-div'
-        >
-          <IonList>
-            {chat.riderOneId === user._id && (
-              <IonItem style={{ borderRadios: '50%' }}>
-                <IonAvatar slot='end'>
-                  <IonIcon
-                    onClick={acceptRequest}
-                    size='large'
-                    color='success'
-                    icon={checkmarkCircle}
-                  />{' '}
-                </IonAvatar>
-                <IonLabel>
-                  <h2>Accept Request</h2>
-                  <p>{moment(chat.createdAt).startOf('minute').fromNow()}</p>
-                </IonLabel>
-              </IonItem>
-            )}
-
-            {chat.message.map((m: any, index: number) => (
-              <IonItem key={index}>
-                <IonAvatar slot={m.sender === user._id ? 'end' : 'start'}>
-                  <img
-                    src={
-                      m.sender === chat.riderOneId
-                        ? chat.riderOneAvatar
-                        : chat.riderTwoAvatar
-                    }
-                    alt='avatar'
-                  />
-                </IonAvatar>
-                <IonLabel>
-                  <p
-                    className={
-                      m.sender === user._id
-                        ? 'float-end text-primary text-wrap'
-                        : 'float-start text-wrap'
-                    }
-                  >
-                    {m.message}
-                  </p>
-                </IonLabel>
-              </IonItem>
-            ))}
-          </IonList>
-          <div className='position-relative bg-danger'>
-            <div
-              className='position-fixed'
-              style={{
-                bottom: 8,
-                width: '86%',
-                zIndex: 1,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                borderRadius: 20,
-              }}
-            >
-              <form onSubmit={sendMessage}>
-                <IonItem fill='solid' className='rounded-pill'>
-                  <IonInput
-                    autofocus={true}
-                    inputMode='text'
-                    value={text}
-                    onIonChange={(e) => setText(e.detail.value!)}
-                    placeholder='Enter Input'
-                  />
-                  <IonButton onClick={sendMessage} slot='end' color='primary'>
-                    <IonIcon icon={send} />
-                  </IonButton>
+      <Header profile={true} nativeBack={true} />
+      <IonContent fullscreen>
+        <div className='h-100 ion-padding' style={style.background}>
+          <div
+            className='rounded-5 mb-2'
+            style={{
+              overflow: 'auto',
+              height: 'calc(100vh - 127px)',
+            }}
+            id='chat-div'
+          >
+            <IonList className='bg-transparent'>
+              {chat.riderOneId === user._id && (
+                <IonItem
+                  className='bg-transparent'
+                  style={{ borderRadios: '50%' }}
+                >
+                  <IonAvatar slot='end'>
+                    <IonIcon
+                      onClick={acceptRequest}
+                      size='large'
+                      color='success'
+                      icon={checkmarkCircle}
+                    />{' '}
+                  </IonAvatar>
+                  <IonLabel>
+                    <h2>Accept Request</h2>
+                    <p>{moment(chat.createdAt).startOf('minute').fromNow()}</p>
+                  </IonLabel>
                 </IonItem>
-              </form>
+              )}
+
+              {chat.message.map((m: any, index: number) => (
+                <IonItem className='bg-transparent' key={index}>
+                  <IonAvatar slot={m.sender === user._id ? 'end' : 'start'}>
+                    <img
+                      src={
+                        m.sender === chat.riderOneId
+                          ? chat.riderOneAvatar
+                          : chat.riderTwoAvatar
+                      }
+                      alt='avatar'
+                    />
+                  </IonAvatar>
+                  <IonLabel>
+                    <p
+                      className={
+                        m.sender === user._id
+                          ? 'float-end text-primary text-wrap'
+                          : 'float-start text-wrap'
+                      }
+                    >
+                      {m.message}
+                    </p>
+                  </IonLabel>
+                </IonItem>
+              ))}
+            </IonList>
+            <div className='position-relative bg-danger'>
+              <div
+                className='position-fixed'
+                style={{
+                  bottom: 8,
+                  width: '86%',
+                  zIndex: 1,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  borderRadius: 20,
+                }}
+              >
+                <form onSubmit={sendMessage}>
+                  <IonItem fill='solid' className='rounded-pill shadow'>
+                    <IonInput
+                      autofocus={true}
+                      inputMode='text'
+                      value={text}
+                      onIonChange={(e) => setText(e.detail.value!)}
+                      placeholder='Enter Input'
+                    />
+                    <IonButton onClick={sendMessage} slot='end' color='primary'>
+                      <IonIcon icon={send} />
+                    </IonButton>
+                  </IonItem>
+                </form>
+              </div>
             </div>
           </div>
         </div>
