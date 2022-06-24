@@ -5,18 +5,13 @@ import { Geolocation } from '@capacitor/geolocation'
 import { useEffect, useState } from 'react'
 import {
   IonApp,
-  // IonIcon,
   IonLabel,
   IonRouterOutlet,
-  // IonTabBar,
-  // IonTabButton,
-  // IonTabs,
   setupIonicReact,
   IonButton,
   IonPage,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-// import { chatbubbleEllipses, home, person } from 'ionicons/icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css'
@@ -105,13 +100,13 @@ const App: React.FC = () => {
     await LocalNotifications.schedule({
       notifications: [
         {
-          title: 'New Notification',
-          body: 'You have a ride request',
+          title: 'Your have a ride request',
+          body: 'Check your chat screen for more information',
           id: 1,
           extra: {
             data: 'Press to open',
           },
-          iconColor: '#f194ff',
+          iconColor: 'purple',
         },
       ],
     })
@@ -237,7 +232,7 @@ const App: React.FC = () => {
               height: '100vh',
               flexDirection: 'column',
             }}
-            className='ion-text-center ion-padding text-light'
+            className='ion-text-center ion-padding'
           >
             <IonButton expand='block' color='danger'>
               No network connection
@@ -295,23 +290,6 @@ const App: React.FC = () => {
           <PublicRoute exact component={OTP} path='/otp' />
           <PublicRoute exact component={SignUp} path='/signup' />
         </IonRouterOutlet>
-        {/* <IonTabBar slot='bottom'>
-            <IonTabButton tab='home' href='/home'>
-              <IonIcon icon={home} />
-              <IonLabel>Home</IonLabel>
-            </IonTabButton>
-
-            <IonTabButton tab='chat' href='/chat'>
-              <IonIcon icon={chatbubbleEllipses} />
-              <IonLabel>Chat</IonLabel>
-            </IonTabButton>
-
-            <IonTabButton tab='profile' href='/profile'>
-              <IonIcon icon={person} />
-              <IonLabel>Profile</IonLabel>
-            </IonTabButton>
-          </IonTabBar> */}
-        {/* </IonTabs> */}
       </IonReactRouter>
     </IonApp>
   )

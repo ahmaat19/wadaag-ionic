@@ -41,8 +41,8 @@ const HomeScreen: React.FC = () => {
               >
                 <IonCard
                   routerLink='/rider-one-screen'
-                  className='text-center bg-transparent shadow-lg mx-auto d-flex justify-content-center align-items-center'
-                  style={{ width: '60%', height: '80%' }}
+                  className='text-center bg-transparents shadow-lg mx-auto d-flex justify-content-center align-items-center'
+                  style={{ width: '60%', height: '80%', ...style.bg_purple }}
                 >
                   <IonLabel className='fs-3 fw-light'>FIRST RIDE</IonLabel>
                 </IonCard>

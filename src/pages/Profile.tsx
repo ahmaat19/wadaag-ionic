@@ -12,6 +12,7 @@ import {
   IonInput,
   IonItem,
   IonLabel,
+  IonList,
   IonLoading,
   IonModal,
   IonPage,
@@ -42,6 +43,7 @@ import useProfilesHook from '../api/profiles'
 import usePaymentsHook from '../api/payments'
 import { defaultUrl } from '../config/url'
 import { style } from '../components/Style'
+import moment from 'moment'
 
 interface ProfilePageProps {
   router: HTMLIonRouterOutletElement | null
@@ -253,6 +255,24 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 
+  const paymentHistory = [
+    {
+      _id: 1,
+      amount: '1.00',
+      date: '1 May, 2022',
+    },
+    {
+      _id: 2,
+      amount: '1.00',
+      date: '15 April, 2022',
+    },
+    {
+      _id: 3,
+      amount: '1.00',
+      date: '21 June, 2022',
+    },
+  ]
+
   return (
     <IonPage>
       <IonHeader collapse='fade' translucent className='ion-no-border'>
@@ -304,17 +324,33 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
             </IonRow>
           </IonGrid>
           <hr className='bg-primary' />
-          <IonLabel className='fw-light'>Payments</IonLabel> <br />
-          <IonChip className='shadow bg-light fw-bold'>
-            <IonIcon icon={filter} color='primary' />
-            <IonLabel color='primary'>Transactions</IonLabel>
-          </IonChip>
-          <IonChip className='shadow bg-light fw-bold float-end'>
-            <IonIcon icon={hourglass} color='primary' />
-            <IonLabel color='primary'>
-              {data && data.expiration} days remaining
+
+          <IonList className='bg-transparent'>
+            <IonLabel>
+              {' '}
+              <IonIcon icon={filter} color='primary' /> Last 3 transactions
             </IonLabel>
-          </IonChip>
+            {paymentHistory.map((history: any) => (
+              <IonItem className='bg-transparent' key={history._id}>
+                <IonLabel className='d-flex justify-content-between'>
+                  <p>{moment(history.date).format('ll')}</p>
+                  <p className='text-success'>${history.amount}</p>
+                </IonLabel>
+              </IonItem>
+            ))}
+          </IonList>
+
+          <IonButton
+            color={`${
+              data && Number(data.expiration) < 3 ? 'danger' : 'success'
+            }`}
+            expand='block'
+            className='shadow mt-3'
+          >
+            <IonIcon icon={hourglass} />
+            <IonLabel>{data && data.expiration} days remaining</IonLabel>
+          </IonButton>
+
           <div className='position-fixed bottom-0 end-0 pb-3 pe-3 ion-padding'>
             {data && data.expiration === 0 && (
               <div>
