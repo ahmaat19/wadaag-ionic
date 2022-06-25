@@ -11,7 +11,7 @@ export default function useReportsHook() {
   const getPaymentTransactions = useQuery(
     queryKey,
     async () => await dynamicAPI('get', `${url}/transactions`, {}),
-    { retry: 0 }
+    { retry: 3 }
   )
 
   const postPaymentReport = useMutation(
