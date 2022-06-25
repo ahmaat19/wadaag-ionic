@@ -67,6 +67,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
   const [userType, setUserType] = useState('')
   const [plate, setPlate] = useState('')
   const [license, setLicense] = useState('')
+  const [isLoadingImageUpload, setIsLoadingImageUpload] = useState(false)
 
   const { getProfile, postProfile } = useProfilesHook()
   const { postPayment } = usePaymentsHook()
@@ -195,6 +196,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
     const blob = await response.blob()
 
     if (blob) {
+      setIsLoadingImageUpload(true)
       const file = new File([blob], 'image.png', { type: 'image/png' })
       const formData = new FormData()
       formData.append('file', file)
@@ -205,6 +207,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
       const json = await response.json()
       if (json) {
         setImage(`${defaultUrl}${json.filePaths[0].path}`)
+        setIsLoadingImageUpload(false)
       }
     }
   }
@@ -212,7 +215,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
   const takePicture = async () => {
     const image = await Camera.getPhoto({
       quality: 90,
-      allowEditing: true,
+      allowEditing: false,
       resultType: CameraResultType.Uri,
     })
 
@@ -221,6 +224,7 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
     const allowedExtensions = ['jpg', 'jpeg', 'png']
 
     if (!allowedExtensions.includes(image.format)) {
+      setIsLoadingImageUpload(false)
       return present({
         buttons: [{ text: 'hide', handler: () => dismiss() }],
         message: 'Image format not supported.',
@@ -255,27 +259,15 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
   // hide ionic tabs bar bottom on profile page
   document.documentElement.style.setProperty('--ion-safe-area-bottom', '0px')
 
-  if (isLoading || isLoadingPayment || isLoadingUpdate || isLoadingPayments) {
+  if (
+    isLoading ||
+    isLoadingPayment ||
+    isLoadingUpdate ||
+    isLoadingPayments ||
+    isLoadingImageUpload
+  ) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
-
-  // const paymentHistory = [
-  //   {
-  //     _id: 1,
-  //     amount: '1.00',
-  //     date: '1 May, 2022',
-  //   },
-  //   {
-  //     _id: 2,
-  //     amount: '1.00',
-  //     date: '15 April, 2022',
-  //   },
-  //   {
-  //     _id: 3,
-  //     amount: '1.00',
-  //     date: '21 June, 2022',
-  //   },
-  // ]
 
   return (
     <IonPage>
@@ -334,6 +326,11 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
               {' '}
               <IonIcon icon={filter} color='primary' /> Last 3 transactions
             </IonLabel>
+            {paymentHistory && paymentHistory.length === 0 && (
+              <p className='text-danger'>
+                There's no previous payment histories
+              </p>
+            )}
             {paymentHistory &&
               paymentHistory.map((history: any) => (
                 <IonItem className='bg-transparent' key={history._id}>
