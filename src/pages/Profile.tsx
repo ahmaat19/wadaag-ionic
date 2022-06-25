@@ -41,6 +41,7 @@ import { RootState } from '../redux/store'
 import { authLogout, setUser } from '../redux/userSlice'
 import useProfilesHook from '../api/profiles'
 import usePaymentsHook from '../api/payments'
+import useReportsHook from '../api/reports'
 import { defaultUrl } from '../config/url'
 import { style } from '../components/Style'
 import moment from 'moment'
@@ -69,10 +70,13 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
 
   const { getProfile, postProfile } = useProfilesHook()
   const { postPayment } = usePaymentsHook()
+  const { getPaymentTransactions } = useReportsHook()
 
   const [showModal, setShowModal] = useState(false)
 
   const { isLoading, isError, error, data, refetch } = getProfile
+  const { isLoading: isLoadingPayments, data: paymentHistory } =
+    getPaymentTransactions
 
   const {
     isLoading: isLoadingUpdate,
@@ -251,27 +255,27 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
   // hide ionic tabs bar bottom on profile page
   document.documentElement.style.setProperty('--ion-safe-area-bottom', '0px')
 
-  if (isLoading || isLoadingPayment || isLoadingUpdate) {
+  if (isLoading || isLoadingPayment || isLoadingUpdate || isLoadingPayments) {
     return <IonLoading isOpen={true} message={'Loading...'} />
   }
 
-  const paymentHistory = [
-    {
-      _id: 1,
-      amount: '1.00',
-      date: '1 May, 2022',
-    },
-    {
-      _id: 2,
-      amount: '1.00',
-      date: '15 April, 2022',
-    },
-    {
-      _id: 3,
-      amount: '1.00',
-      date: '21 June, 2022',
-    },
-  ]
+  // const paymentHistory = [
+  //   {
+  //     _id: 1,
+  //     amount: '1.00',
+  //     date: '1 May, 2022',
+  //   },
+  //   {
+  //     _id: 2,
+  //     amount: '1.00',
+  //     date: '15 April, 2022',
+  //   },
+  //   {
+  //     _id: 3,
+  //     amount: '1.00',
+  //     date: '21 June, 2022',
+  //   },
+  // ]
 
   return (
     <IonPage>
@@ -330,14 +334,15 @@ const Profile: React.FC<ProfilePageProps> = ({ router }) => {
               {' '}
               <IonIcon icon={filter} color='primary' /> Last 3 transactions
             </IonLabel>
-            {paymentHistory.map((history: any) => (
-              <IonItem className='bg-transparent' key={history._id}>
-                <IonLabel className='d-flex justify-content-between'>
-                  <p>{moment(history.date).format('ll')}</p>
-                  <p className='text-success'>${history.amount}</p>
-                </IonLabel>
-              </IonItem>
-            ))}
+            {paymentHistory &&
+              paymentHistory.map((history: any) => (
+                <IonItem className='bg-transparent' key={history._id}>
+                  <IonLabel className='d-flex justify-content-between'>
+                    <p>{moment(history.date).format('ll')}</p>
+                    <p className='text-success'>${history.amount}</p>
+                  </IonLabel>
+                </IonItem>
+              ))}
           </IonList>
 
           <IonButton

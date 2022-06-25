@@ -1,27 +1,21 @@
 import dynamicAPI from './dynamicAPI'
-import {
-  useMutation,
-  // useQuery ,
-  useQueryClient,
-} from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 
-const url = '/api/reports'
+const url = '/api/reports/payments'
 
-// const queryKey = 'reports'
+const queryKey = 'payments'
 
 export default function useReportsHook() {
-  //   const { page = 1, id, q = '', limit = 25 } = props
   const queryClient = useQueryClient()
 
-  //   const getReports = useQuery(
-  //     queryKey,
-  //     async () =>
-  //       await dynamicAPI('get', `${url}?page=${page}&q=${q}&limit=${limit}`, {}),
-  //     { retry: 0 }
-  //   )
+  const getPaymentTransactions = useQuery(
+    queryKey,
+    async () => await dynamicAPI('get', `${url}/transactions`, {}),
+    { retry: 0 }
+  )
 
   const postPaymentReport = useMutation(
-    async (obj) => await dynamicAPI('post', `${url}/payments`, obj),
+    async (obj) => await dynamicAPI('post', `${url}/`, obj),
     {
       retry: 0,
       onSuccess: () => queryClient.invalidateQueries(['payments report']),
@@ -29,7 +23,7 @@ export default function useReportsHook() {
   )
 
   return {
-    // getReports,
+    getPaymentTransactions,
     postPaymentReport,
   }
 }
